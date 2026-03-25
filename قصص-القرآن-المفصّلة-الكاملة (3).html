@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>قصص القرآن الكريم</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2ede4;--bg2:#ede6d9;--bg3:#e5dccf;
+  --card:#faf7f2;--card2:#f5f0e8;--card3:#ede8de;
+  --gold:#b8973a;--gold2:#d4af5a;--gold3:#e8c97a;
+  --gl:rgba(184,151,58,.13);--gm:rgba(184,151,58,.28);
+  --text:#3d2f1e;--text2:#5d4e37;--text3:#8a7260;
+  --border:rgba(184,151,58,.3);--border2:rgba(93,78,55,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(184,151,58,.055) 39px,rgba(184,151,58,.055) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(184,151,58,.055) 39px,rgba(184,151,58,.055) 40px)}
+
+/* ===== SHARED UTILS ===== */
+.panel{position:fixed;inset:0;z-index:20;display:flex;justify-content:center;transform:translateX(-100%);transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.panel.open{transform:translateX(0)}
+.pi{width:100%;max-width:480px;height:100%;background:var(--card);display:flex;flex-direction:column;box-shadow:4px 0 30px rgba(93,78,55,.14)}
+.ph{flex-shrink:0;background:var(--card);border-bottom:1px solid var(--border2);padding:10px 14px 7px}
+.ph-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.back-btn,.home-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--gl);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.back-btn:hover,.home-btn:hover{background:var(--gm)}
+.back-btn svg,.home-btn svg{width:13px;height:13px;stroke:var(--text2)}
+.ph-cat{font-size:10px;font-weight:600;letter-spacing:.3px}
+.ph-orn{display:flex;align-items:center;gap:4px}
+.ph-orn-line{flex:1;height:.5px;background:var(--border)}
+.ph-orn-dm{width:5px;height:5px;transform:rotate(45deg);border:1px solid var(--gold);flex-shrink:0}
+.pscroll{flex:1;overflow-y:auto;padding:13px 15px 26px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.pscroll::-webkit-scrollbar{width:3px}.pscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sec-ttl{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.6px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.sec-ttl::before{content:'';display:inline-block;width:11px;height:1px;background:var(--gold)}
+.sec-body{font-size:13px;line-height:1.88;color:var(--text2)}
+.ayah-box{border-radius:11px;padding:12px 14px 9px;background:var(--card2);border:1px solid var(--border);margin-bottom:12px}
+.ayah-text{font-family:'Amiri',serif;font-size:17px;line-height:2.1;color:var(--text);text-align:center}
+.ayah-ref{font-size:10px;text-align:center;margin-top:4px;color:var(--gold);font-weight:500}
+.lesson-box{border-radius:10px;padding:10px 12px;background:var(--gl);border:1px solid var(--border);margin-bottom:10px}
+.lesson-lbl,.note-lbl{font-size:9px;font-weight:700;letter-spacing:.7px;color:var(--gold);margin-bottom:4px}
+.lesson-txt,.note-txt{font-size:12.5px;line-height:1.75;color:var(--text2)}
+.link-box{border-radius:10px;padding:10px 12px;background:var(--card3);border:1px solid var(--border2)}
+.link-lbl{font-size:9px;font-weight:700;letter-spacing:.6px;color:var(--text3);margin-bottom:3px}
+.link-txt{font-size:12px;line-height:1.7;color:var(--text2)}
+.surah-row{padding:7px 10px;border-radius:8px;background:var(--card3);border:1px solid var(--border2);margin-bottom:5px}
+.surah-name{font-size:11px;font-weight:600;margin-bottom:2px}
+.surah-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.pills{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px}
+.pill{font-size:10px;padding:2px 8px;border-radius:9px;background:var(--gl);border:1px solid var(--border);color:var(--text2)}
+.note-box{border-radius:10px;padding:10px 12px;margin-bottom:10px;border-right:3px solid var(--gold);background:var(--gl)}
+.chars-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.char-tag{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;background:var(--gl);border:1px solid var(--border);color:var(--text2)}
+.stage-detail-body{font-size:13px;line-height:1.95;color:var(--text2)}
+.stage-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);margin-bottom:6px;cursor:pointer;transition:all .15s;position:relative}
+.stage-item:hover{background:var(--card3);border-color:var(--border);transform:translateX(-2px)}
+.si-num{width:22px;height:22px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.si-content{flex:1}
+.si-title{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:2px;line-height:1.4}
+.si-hint{font-size:10px}
+.si-arrow svg{width:12px;height:12px;stroke:var(--text3)}
+.ssp{padding:3px 9px;border-radius:12px;font-size:10px;border:1px solid;cursor:pointer;transition:all .15s}
+.ssp.on{color:var(--card)}
+.stage-step-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.stage-counter{text-align:center;font-size:11px;color:var(--text3);padding:5px 0 1px;flex-shrink:0}
+.stage-nav{display:flex;gap:8px;padding:7px 14px 0;flex-shrink:0}
+.snav-btn{flex:1;padding:8px;border-radius:9px;border:1px solid var(--border);background:var(--gl);cursor:pointer;font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11px;color:var(--text2);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.snav-btn:hover{background:var(--gm)}
+.snav-btn:disabled{opacity:.3;cursor:not-allowed}
+.snav-btn svg{width:11px;height:11px;stroke:currentColor}
+
+/* ===== HOME SCREEN ===== */
+#v-home{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;background:transparent}
+.home-wrap{width:100%;max-width:480px;height:100%;display:flex;flex-direction:column}
+.hh{background:var(--card);border-bottom:1px solid var(--border2);flex-shrink:0;padding:12px 15px 0}
+.hh-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.hh-title{font-size:15px;font-weight:700;color:var(--gold)}
+.hh-sub{font-size:10px;font-family:'Amiri',serif;color:var(--text3);margin-top:1px}
+.hh-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--gl);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hh-btn:hover{background:var(--gm)}
+.hh-btn svg{width:13px;height:13px;stroke:var(--gold)}
+.horn{display:flex;align-items:center;gap:4px;padding:5px 0}
+.horn-line{flex:1;height:1px;background:linear-gradient(to left,transparent,var(--gold),transparent)}
+.horn-dm{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}
+.horn-dot{width:3px;height:3px;background:var(--gold3);border-radius:50%;flex-shrink:0}
+
+/* Era timeline */
+.home-scroll{flex:1;overflow-y:auto;padding:10px 12px 20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.home-scroll::-webkit-scrollbar{width:3px}.home-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.home-stats{display:flex;gap:10px;margin-bottom:12px}
+.hstat{flex:1;padding:8px 10px;border-radius:10px;background:var(--card);border:1px solid var(--border);text-align:center}
+.hstat-n{font-size:20px;font-weight:700;color:var(--gold)}
+.hstat-l{font-size:10px;color:var(--text3);margin-top:1px}
+.browse-btn{width:100%;padding:10px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;margin-bottom:14px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.browse-btn:hover{background:var(--gl);border-color:var(--gold)}
+.browse-btn svg{width:13px;height:13px;stroke:var(--text2)}
+.era-label{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.era-label::before{content:'';display:inline-block;width:10px;height:1px;background:var(--text3)}
+.era-block{margin-bottom:6px;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--card)}
+.era-head{padding:11px 14px 10px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .15s}
+.era-head:hover{background:var(--gl)}
+.era-color-strip{width:4px;height:36px;border-radius:2px;flex-shrink:0}
+.era-head-text{flex:1}
+.era-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.era-period{font-size:10px;color:var(--text3)}
+.era-count{font-size:11px;font-weight:600;flex-shrink:0}
+.era-arrow{flex-shrink:0;transition:transform .2s}
+.era-arrow.open{transform:rotate(90deg)}
+.era-arrow svg{width:12px;height:12px;stroke:var(--text3)}
+.era-stories{display:none;padding:0 10px 10px}
+.era-stories.open{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.era-story-card{padding:9px 10px 8px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);cursor:pointer;transition:all .15s}
+.era-story-card:hover{background:var(--card3);border-color:var(--border);transform:translateY(-1px)}
+.esc-name{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.4}
+.esc-surahs{font-size:9px;color:var(--text3)}
+.esc-stages{font-size:9px;font-weight:600;margin-top:3px}
+
+/* ===== LIST PANEL ===== */
+#v-list{z-index:20}
+.lh{background:var(--card);border-bottom:1px solid var(--border2);flex-shrink:0;padding:10px 14px 0}
+.lh-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.lh-title{font-size:14px;font-weight:700;color:var(--gold)}
+.lh-sub{font-size:10px;font-family:'Amiri',serif;color:var(--text3);margin-top:1px}
+.lh-btns{display:flex;gap:5px}
+.lorn{display:flex;align-items:center;gap:4px;padding:5px 0}
+.lorn-line{flex:1;height:1px;background:linear-gradient(to left,transparent,var(--gold),transparent)}
+.lorn-dm{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0}
+.lorn-dot{width:3px;height:3px;background:var(--gold3);border-radius:50%;flex-shrink:0}
+.cats{display:flex;gap:5px;overflow-x:auto;padding:6px 14px 8px;background:var(--card);border-bottom:1px solid var(--border2);flex-shrink:0;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);white-space:nowrap;transition:all .18s;flex-shrink:0}
+.cat.on{color:var(--card);border-color:transparent;font-weight:600}
+.lstats{display:flex;gap:12px;padding:6px 14px;background:var(--card2);border-bottom:1px solid var(--border2);flex-shrink:0}
+.lstat{font-size:11px;color:var(--text3)}.lstat span{font-weight:600;color:var(--gold)}
+.list-scroll{flex:1;overflow-y:auto;padding:10px 12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.list-scroll::-webkit-scrollbar{width:3px}.list-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{background:var(--card);border-radius:13px;border:1px solid var(--border);padding:11px 11px 10px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 1px 8px rgba(93,78,55,.07)}
+.sc:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(93,78,55,.12)}
+.sc:active{transform:scale(.97)}
+.sc-badge{font-size:9px;font-weight:600;margin-bottom:4px}
+.sc-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px}
+.sc-pills{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:4px}
+.sc-pill{font-size:9px;padding:2px 5px;border-radius:7px;background:var(--gl);border:1px solid var(--border);color:var(--text3)}
+.sc-teaser{font-size:10.5px;color:var(--text3);line-height:1.5}
+
+/* ===== STORY PANEL ===== */
+#v-story{z-index:30}
+
+/* ===== STAGE PANEL ===== */
+#v-stage{z-index:40}
+
+/* ===== SPLASH ===== */
+.splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;transition:opacity .5s}
+.splash::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(184,151,58,.07) 39px,rgba(184,151,58,.07) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(184,151,58,.07) 39px,rgba(184,151,58,.07) 40px)}
+.splash.gone{opacity:0;pointer-events:none}
+.sp-inner{max-width:330px;width:100%;text-align:center;position:relative;z-index:1}
+.sp-ar{font-family:'Amiri',serif;font-size:44px;color:var(--gold);margin-bottom:7px}
+.sp-orn{display:flex;align-items:center;gap:7px;margin:0 auto 13px;max-width:180px}
+.sp-ol{flex:1;height:1px;background:linear-gradient(to left,transparent,var(--gold),transparent)}
+.sp-od{width:7px;height:7px;background:var(--gold);transform:rotate(45deg)}
+.sp-t1{font-size:19px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sp-t2{font-family:'Amiri',serif;font-size:12.5px;color:var(--gold);margin-bottom:7px;line-height:1.8}
+.sp-sub{font-size:11px;color:var(--text3);line-height:1.8;margin-bottom:18px}
+.sp-counts{display:flex;justify-content:center;gap:16px;margin-bottom:20px}
+.sp-cn{font-size:21px;font-weight:700;color:var(--gold)}
+.sp-cl{font-size:10px;color:var(--text3)}
+.sp-btn{padding:12px 38px;border-radius:12px;background:var(--gold);color:var(--card);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:14px;font-weight:600;border:none;cursor:pointer;box-shadow:0 4px 18px rgba(184,151,58,.4)}
+
+/* modal/toast */
+.modal-bg{position:fixed;inset:0;background:rgba(61,47,30,.5);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal{width:100%;max-width:480px;margin:0 auto;background:var(--card);border-radius:20px 20px 0 0;padding:15px 18px 24px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);border-top:1px solid var(--border)}
+.modal-bg.show .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:3px;border-radius:2px;background:var(--border);margin:0 auto 11px}
+.morn{display:flex;align-items:center;gap:6px;margin-bottom:11px}
+.morn-line{flex:1;height:.5px;background:var(--border)}
+.morn-dm{width:5px;height:5px;transform:rotate(45deg);background:var(--gold);flex-shrink:0}
+.morn-title{font-size:13px;font-weight:600;color:var(--text);text-align:center}
+.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0 8px}
+.sh-btn{padding:10px 5px;border-radius:10px;background:var(--bg2);border:1px solid var(--border2);cursor:pointer;text-align:center;transition:all .15s}
+.sh-btn:hover{background:var(--gl);border-color:var(--border)}
+.sh-ic{font-size:17px;margin-bottom:3px}
+.sh-lbl{font-size:10px;color:var(--text3)}
+.modal-close{width:100%;padding:9px;border-radius:10px;background:var(--gl);border:1px solid var(--border);color:var(--text2);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:12px;cursor:pointer}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 15px;font-size:12px;color:var(--text);opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:300;box-shadow:0 4px 14px rgba(93,78,55,.14)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(min-width:520px){body{background:#ddd6c9}.home-wrap,.pi{box-shadow:0 0 40px rgba(93,78,55,.14);border:1px solid var(--border2)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .27s ease forwards}
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <div class="sp-inner">
+    <div class="sp-ar">﴿ قَصَصٌ ﴾</div>
+    <div class="sp-orn"><div class="sp-ol"></div><div class="sp-od"></div><div class="sp-ol"></div></div>
+    <div class="sp-t1">قصص القرآن الكريم</div>
+    <div class="sp-t2">﴿ نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ ﴾</div>
+    <div class="sp-sub">كل قصة مُفصَّلة مرحلة بمرحلة — اضغط أي مرحلة لتفاصيلها الكاملة<br>مُصنَّفة حسب الحقبة الزمنية التاريخية</div>
+    <div class="sp-counts">
+      <div><div class="sp-cn">20</div><div class="sp-cl">قصة</div></div>
+      <div><div class="sp-cn">+120</div><div class="sp-cl">مرحلة</div></div>
+      <div><div class="sp-cn">7</div><div class="sp-cl">حقب زمنية</div></div>
+    </div>
+    <button class="sp-btn" onclick="startApp()">ابدأ الرحلة</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="v-home">
+  <div class="home-wrap">
+    <div class="hh">
+      <div class="hh-row">
+        <div><div class="hh-title">قصص القرآن الكريم</div><div class="hh-sub">﴿ نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ ﴾</div></div>
+        <button class="hh-btn" onclick="openModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+      </div>
+      <div class="horn"><div class="horn-line"></div><div class="horn-dot"></div><div class="horn-dm"></div><div class="horn-dot"></div><div class="horn-line"></div></div>
+    </div>
+    <div class="home-scroll">
+      <div class="home-stats">
+        <div class="hstat"><div class="hstat-n">20</div><div class="hstat-l">قصة كاملة</div></div>
+        <div class="hstat"><div class="hstat-n">+120</div><div class="hstat-l">مرحلة مفصّلة</div></div>
+        <div class="hstat"><div class="hstat-n">7</div><div class="hstat-l">حقب زمنية</div></div>
+      </div>
+      <button class="browse-btn" onclick="openListPanel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+        تصفّح القصص حسب الموضوع
+      </button>
+      <div class="era-label">الفهرس الزمني — الحقبة التاريخية</div>
+      <div id="era-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIST PANEL -->
+<div class="panel" id="v-list">
+  <div class="pi">
+    <div class="lh">
+      <div class="lh-row">
+        <div><div class="lh-title" id="lh-title">القصص حسب الموضوع</div><div class="lh-sub">اختر قسماً للاستكشاف</div></div>
+        <div class="lh-btns">
+          <button class="home-btn" onclick="goHome()" title="الرئيسية"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
+          <button class="hh-btn" onclick="openModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        </div>
+      </div>
+      <div class="lorn"><div class="lorn-line"></div><div class="lorn-dot"></div><div class="lorn-dm"></div><div class="lorn-dot"></div><div class="lorn-line"></div></div>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="lstats"><div class="lstat">القسم: <span id="catLbl">—</span></div><div class="lstat">القصص: <span id="catCnt">—</span></div><div class="lstat">الإجمالي: <span>20</span></div></div>
+    <div class="list-scroll"><div class="grid" id="grid"></div></div>
+  </div>
+</div>
+
+<!-- STORY PANEL -->
+<div class="panel" id="v-story">
+  <div class="pi">
+    <div class="ph">
+      <div class="ph-row">
+        <button class="back-btn" onclick="closeStory()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div style="flex:1"><div class="ph-cat" id="s-cat"></div><div style="font-size:10px;color:var(--text3)">← الرجوع</div></div>
+        <button class="home-btn" onclick="goHome()" title="الرئيسية" style="margin-left:3px"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
+        <button class="hh-btn" onclick="openModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+      </div>
+      <div class="ph-orn"><div class="ph-orn-line"></div><div class="ph-orn-dm"></div><div class="ph-orn-line"></div></div>
+    </div>
+    <div class="pscroll" id="s-scroll"></div>
+  </div>
+</div>
+
+<!-- STAGE PANEL -->
+<div class="panel" id="v-stage">
+  <div class="pi">
+    <div class="ph">
+      <div class="ph-row">
+        <button class="back-btn" onclick="closeStage()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div style="flex:1"><div class="ph-cat" id="st-name"></div><div style="font-size:10px;color:var(--text3)">← الرجوع للقصة</div></div>
+        <button class="home-btn" onclick="goHome()" title="الرئيسية" style="margin-left:3px"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
+      </div>
+      <div class="ph-orn"><div class="ph-orn-line"></div><div class="ph-orn-dm"></div><div class="ph-orn-line"></div></div>
+    </div>
+    <div class="stage-counter" id="st-counter"></div>
+    <div class="stage-nav">
+      <button class="snav-btn" id="st-prev" onclick="navStage(-1)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>السابق</button>
+      <button class="snav-btn" id="st-next" onclick="navStage(1)">التالي<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    </div>
+    <div class="pscroll" id="st-scroll"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="morn"><div class="morn-line"></div><div class="morn-dm"></div><div class="morn-title">مشاركة الموسوعة</div><div class="morn-dm"></div><div class="morn-line"></div></div>
+    <div class="share-grid">
+      <div class="sh-btn" onclick="doShare('link')"><div class="sh-ic">📋</div><div class="sh-lbl">نسخ الرابط</div></div>
+      <div class="sh-btn" onclick="doShare('dl')"><div class="sh-ic">💾</div><div class="sh-lbl">تحميل</div></div>
+      <div class="sh-btn" onclick="doShare('card')"><div class="sh-ic">🃏</div><div class="sh-lbl">نسخ القصة</div></div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">إغلاق</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================  ERAS  */
+const ERAS=[
+  {id:'e1',name:'فجر الخليقة',period:'بداية البشرية',color:'#2d6b52',
+   desc:'أول الإنسان وأول الخطأ وأول جريمة في التاريخ',
+   stories:['adam','idris','qabil']},
+  {id:'e2',name:'عصر الطوفان والأنبياء الأوائل',period:'حقبة سحيقة في الزمن',color:'#1a5c7a',
+   desc:'أطول رحلة دعوة في التاريخ وأشد العقوبات الكونية',
+   stories:['nuh','hud','salih','lut']},
+  {id:'e3',name:'عصر إبراهيم وذريته',period:'~2000-1700 ق.م',color:'#7a5a20',
+   desc:'خليل الله وأبو الأنبياء — من التوحيد للكعبة',
+   stories:['ibrahim','ismail','ishaq_yaqub','yusuf','shuaib']},
+  {id:'e4',name:'عصر بني إسرائيل',period:'~1300-1000 ق.م',color:'#1a5c7a',
+   desc:'من قصر فرعون إلى شق البحر ومسيرة الأمة',
+   stories:['musa','khidr','qarun','talut_dawud']},
+  {id:'e5',name:'عصر الملوك الأنبياء',period:'~1000-900 ق.م',color:'#5a3d7a',
+   desc:'حضارة داود وسليمان وملكة سبأ',
+   stories:['dawud','sulayman','bilqis']},
+  {id:'e6',name:'عصر الأنبياء الأواخر',period:'~900 ق.م — ميلاد عيسى',color:'#7a3a3a',
+   desc:'أنبياء المحن والصبر حتى مريم وعيسى',
+   stories:['ayyub','yunus','zakariya_yahya','isa_mariam','luqman']},
+  {id:'e7',name:'قصص خارج الزمن',period:'قصص دائمة الدرس',color:'#3d5a2d',
+   desc:'قصص تُعلّمنا دروساً كونية بصرف النظر عن الزمن',
+   stories:['kahf','dhul_qarnayn','ukhdud','feel','mumin','jannatayn','asiya']},
+];
+
+/* ============================================================  CATS  */
+const CATS=[
+  {id:'qabla',label:'ما قبل إبراهيم',color:'#2d6b52'},
+  {id:'ibrahim',label:'إبراهيم وذريته',color:'#7a5a20'},
+  {id:'musa',label:'موسى وبنو إسرائيل',color:'#1a5c7a'},
+  {id:'dawud',label:'داود وسليمان',color:'#5a3d7a'},
+  {id:'anbiya',label:'أنبياء آخرون',color:'#7a3a3a'},
+  {id:'others',label:'قصص أخرى',color:'#3d5a2d'},
+];
+
+/* ============================================================  STORIES  */
+const STORIES=[
+  /* ===== ما قبل إبراهيم ===== */
+  {id:'adam',cat:'qabla',name:'سيدنا آدم عليه السلام',surahs:['البقرة','الأعراف','الحجر','طه'],
+   ayah:'﴿وَعَلَّمَ آدَمَ الْأَسْمَاءَ كُلَّهَا﴾',ref:'البقرة: 31',
+   teaser:'أول إنسان وأول نبي — الخلق والتكريم والهبوط',
+   summary:'خلق الله آدم بيده من طين ونفخ فيه روحه وأسجد له الملائكة تكريماً. علّمه الأسماء كلها فتفوّق. أسكنه الجنة مع حواء فأغواهما إبليس فأكلا من الشجرة. هبطا للأرض. تاب الله عليهما واصطفاهما.',
+   stages:[
+     {title:'الخلق من طين ونفخ الروح',hint:'كيف خُلق آدم وما الذي ميّزه؟',chars:['الله تعالى','آدم','الملائكة'],ayah:'﴿خَلَقْتُهُ بِيَدَيَّ وَنَفَخْتُ فِيهِ مِن رُّوحِي﴾',ayah_ref:'ص: 75',detail:'خلق الله آدم من صلصال بيده مباشرة — وهذا تشريف ليس لغيره. ثم نفخ فيه من روحه. بهذا جمع الإنسان عالمين: جسد من أرض وروح من ربّ. هذا هو أساس كرامته التي جعلت الملائكة تسجد له.',note:'الإنسان يحمل روح الله فيه — هذا مصدر كرامته ومصدر مسؤوليته. من يحمل هذه الروح لا يليق به الانحدار.'},
+     {title:'تعليم الأسماء والتفوق على الملائكة',hint:'لماذا كان العلم هو سبب التكريم؟',chars:['الله تعالى','آدم','الملائكة'],ayah:'﴿وَعَلَّمَ آدَمَ الْأَسْمَاءَ كُلَّهَا﴾',ayah_ref:'البقرة: 31',detail:'علّم الله آدم أسماء كل الأشياء. حين عجزت الملائكة عن الإجابة وأجاب آدم بحرية كانت الحجة قاطعة: الإنسان يحمل علماً لا تحمله الملائكة. التكريم ليس بالعبادة فقط بل بالعلم أيضاً.',note:'العلم أساس الخلافة. الإنسان مُؤهَّل ليكون خليفة لأنه يتعلم ويُعلّم ويبني على علم.'},
+     {title:'رفض إبليس السجود وطرده',hint:'لماذا رفض إبليس والعواقب؟',chars:['الله تعالى','الملائكة','إبليس'],ayah:'﴿قَالَ أَنَا خَيْرٌ مِّنْهُ خَلَقْتَنِي مِن نَّارٍ وَخَلَقْتَهُ مِن طِينٍ﴾',ayah_ref:'الأعراف: 12',detail:'أمر الله الملائكة بالسجود لآدم تكريماً فسجدوا جميعاً إلا إبليس. قاس إبليس بمنطقه: "أنا خير منه — أنا من نار وهو من طين". لم يكذّب بل رفض الطاعة بالكبر. فطُرد وطلب الإنظار لإغواء البشر.',note:'الكبر حجب عقل إبليس عن الطاعة. الفارق بين المؤمن والشيطان: الطاعة لله حتى حين لا تفهم الحكمة.'},
+     {title:'الإسكان في الجنة والوسوسة',hint:'كيف أغوى إبليس آدم وحواء؟',chars:['آدم','حواء','إبليس'],ayah:'﴿وَلَا تَقْرَبَا هَٰذِهِ الشَّجَرَةَ فَتَكُونَا مِنَ الظَّالِمِينَ﴾',ayah_ref:'البقرة: 35',detail:'أُسكن آدم وحواء الجنة بكل خيراتها مع شرط واحد: لا تقربا شجرة بعينها. جاء إبليس بوسوسة مُلبَّسة: "ما نهاكما ربكما عنها إلا أن تكونا ملكين أو خالدين". الوسوسة لم تكن أمراً صريحاً بل شكّاً وإغراءً.',note:'الوسوسة دائماً تأتي بلغة الخير المُدّعى. إبليس لم يقل "اعصِ الله" بل قال "ستكونان أفضل".'},
+     {title:'الهبوط للأرض والتوبة',hint:'كيف تاب آدم وما الفرق بينه وبين إبليس؟',chars:['آدم','حواء','الله تعالى'],ayah:'﴿فَتَلَقَّىٰ آدَمُ مِن رَّبِّهِ كَلِمَاتٍ فَتَابَ عَلَيْهِ﴾',ayah_ref:'البقرة: 37',detail:'أكلا من الشجرة فهبطا للأرض. الفرق بين آدم وإبليس: آدم قال "ربنا ظلمنا أنفسنا" فاعترف. إبليس قال "فبما أغويتني" وألقى المسؤولية على الله. علّم الله آدم كلمات التوبة فاستغفر فتاب الله عليه واصطفاه.',note:'الاعتراف بالخطأ وأخذ المسؤولية هو الفارق بين المؤمن والشيطان. التوبة باب الله لا يُغلق.'},
+   ],
+   surah_details:[{n:'البقرة (30-39)',d:'الخلافة وتعليم الأسماء والهبوط'},{n:'الأعراف (11-25)',d:'إبليس والسجود والوسوسة'},{n:'طه (115-123)',d:'التوبة والاصطفاء'}],
+   lesson:'الإنسان مكرّم بالعلم والإرادة. الخطأ لا يعني النهاية — التوبة تُعيد الاصطفاء.',link:'البقرة=الخلافة، الأعراف=الإغواء، طه=التوبة.'},
+
+  {id:'idris',cat:'qabla',name:'سيدنا إدريس عليه السلام',surahs:['مريم','الأنبياء'],
+   ayah:'﴿وَرَفَعْنَاهُ مَكَانًا عَلِيًّا﴾',ref:'مريم: 57',
+   teaser:'الصدّيق النبي الذي رفعه الله مكاناً علياً',
+   summary:'إدريس عليه السلام من أوائل الأنبياء. وُصف بالصدّيق النبي — الصدق أساس مقامه. القرآن ذكره في جملتين: "كان صدّيقاً نبياً" و"رفعناه مكاناً علياً". الرفع المادي والمعنوي معاً.',
+   stages:[
+     {title:'الصدّيقية — طريق الرفع',hint:'ما الذي جعل إدريس يستحق الرفع العلي؟',chars:['إدريس'],ayah:'﴿وَاذْكُرْ فِي الْكِتَابِ إِدْرِيسَ إِنَّهُ كَانَ صِدِّيقًا نَّبِيًّا﴾',ayah_ref:'مريم: 56',detail:'وصف القرآن إدريس بكلمتين: "صدّيق" و"نبي". الصدّيق هو من بلغ درجة الصدق الكامل في القول والعمل والنية. هذه الصفة قبل النبوة — أي أن الصدق أوصله لمقام النبوة.',note:'الصدق طريق قصير للرفع الإلهي. لا يُذكر إدريس بأعمال كثيرة بل بصفة واحدة — الصدق.'},
+     {title:'الرفع المكاني العلي',hint:'ما المعنى العميق للرفع العلي؟',chars:['إدريس','الله تعالى'],ayah:'﴿وَرَفَعْنَاهُ مَكَانًا عَلِيًّا﴾',ayah_ref:'مريم: 57',detail:'القرآن لم يُفصّل كيفية الرفع — لكنه أخبر بالنتيجة: مكان علي. الرفع قد يكون مادياً (رُفع للسماء كإلياس) أو معنوياً (مكانة رفيعة عند الله). كلاهما تكريم نادر لم يُعطَ لكثيرين.',note:'القرآن يُعظّم بالإيجاز أحياناً. جملة واحدة "رفعناه مكاناً علياً" تُخبر بمكانة يُحسدها الملائكة.'},
+   ],
+   surah_details:[{n:'مريم (56-57)',d:'الوصف الجوهري: صدّيق نبي رُفع مكاناً علياً'},{n:'الأنبياء (85-86)',d:'ذكره في سياق الصابرين المرحومين'}],
+   lesson:'الصدق طريق الرفع الإلهي. جملتان في القرآن كافيتان لتكريم نبي كامل.',link:'ذكره في مريم والأنبياء في سياق الأنبياء المكرّمين — نموذج الرفع الإيماني الخالص.'},
+
+  {id:'qabil',cat:'qabla',name:'قابيل وهابيل — أول جريمة',surahs:['المائدة (27-31)'],
+   ayah:'﴿وَاتْلُ عَلَيْهِمْ نَبَأَ ابْنَيْ آدَمَ بِالْحَقِّ إِذْ قَرَّبَا قُرْبَانًا﴾',ref:'المائدة: 27',
+   teaser:'أول جريمة قتل في التاريخ — والغراب يُعلّم الإنسان الدفن',
+   summary:'قرّب ابنا آدم قرباناً. قُبل من هابيل دون قابيل فحسد وقتل. جلس حائراً لا يعرف كيف يدفن أخاه. أرسل الله غراباً يُعلّمه. ندم قابيل بعد فوات الأوان.',
+   stages:[
+     {title:'القربانان وقبول أحدهما',hint:'لماذا قُبل قربان هابيل دون قابيل؟',chars:['هابيل','قابيل'],ayah:'﴿إِذْ قَرَّبَا قُرْبَانًا فَتُقُبِّلَ مِنْ أَحَدِهِمَا وَلَمْ يُتَقَبَّلْ مِنَ الْآخَرِ﴾',ayah_ref:'المائدة: 27',detail:'قدّم الاثنان قرباناً لله. قبل الله قربان هابيل لأنه قدّمه بإخلاص وأعطى أفضل ما لديه. قابيل أعطى الأردأ غير مُبالٍ. القبول والرد علامة على الإخلاص في النية لا على الكمّ.',note:'الله يقبل القليل المُخلَص ويرد الكثير المُنافَق. معيار القبول الإخلاص لا الكمية.'},
+     {title:'الحسد والتهديد بالقتل',hint:'كيف تحوّل الحسد إلى تهديد صريح؟',chars:['قابيل','هابيل'],ayah:'﴿قَالَ لَأَقْتُلَنَّكَ قَالَ إِنَّمَا يَتَقَبَّلُ اللَّهُ مِنَ الْمُتَّقِينَ﴾',ayah_ref:'المائدة: 27',detail:'بدل أن يسأل قابيل نفسه "لماذا لم يُقبل قرباني؟" حوّل غضبه على أخيه البريء. قال صريحاً: "لأقتلنّك". ردّ هابيل بهدوء كامل: "إنما يتقبل الله من المتقين". لم يتهدد ولم يستعدّ للقتال.',note:'الحسد يُعمي عن الحق ويُوجّه الغضب نحو غير المسبب. هابيل نموذج المؤمن: يرد بالحقيقة لا بالتهديد.'},
+     {title:'رفض الدفاع عن النفس وأول قتل',hint:'لماذا رفض هابيل الدفاع؟',chars:['قابيل','هابيل'],ayah:'﴿لَئِن بَسَطتَ إِلَيَّ يَدَكَ لِتَقْتُلَنِي مَا أَنَا بِبَاسِطٍ يَدِيَ إِلَيْكَ لِأَقْتُلَكَ إِنِّي أَخَافُ اللَّهَ﴾',ayah_ref:'المائدة: 28',detail:'قال هابيل: "لو بسطت يدك لتقتلني ما أنا بباسط يدي إليك لأقتلك — إني أخاف الله". رفض الدفاع عن النفس بالقتل لأن الله هو الحكم لا هو. قتله قابيل. كانت أول جريمة قتل في تاريخ البشرية.',note:'من قتل نفساً بغير حق فكأنما قتل الناس جميعاً — هذا الحكم القرآني جاء مباشرة بعد هذه القصة.'},
+     {title:'الغراب يُعلّم الدفن والندم',hint:'ما قصة الغراب وماذا تعلّمت منها البشرية؟',chars:['قابيل','الغراب'],ayah:'﴿فَبَعَثَ اللَّهُ غُرَابًا يَبْحَثُ فِي الْأَرْضِ لِيُرِيَهُ كَيْفَ يُوَارِي سَوْءَةَ أَخِيهِ﴾',ayah_ref:'المائدة: 31',detail:'جلس قابيل حائراً بجثة أخيه لا يعرف ماذا يصنع بها. أرسل الله غراباً يحفر الأرض ويدفن غراباً آخر. فهم قابيل: هكذا يُواري المرء جثة الميت. قال: "يا ويلتا أعجزت أن أكون مثل هذا الغراب؟". ندمه جاء بعد فعلته.',note:'الإنسان الذي يُحسن مقامه أقل من غراب حين يرتكب الجريمة. الغراب علّم الإنسان الدفن — أول درس بشري.'},
+   ],
+   surah_details:[{n:'المائدة (27-31)',d:'القصة كاملة من القربان للدفن والندم'}],
+   lesson:'الحسد يُوصل للقتل. الإخلاص معيار القبول لا الكمية. من ارتكب الجريمة أصبح أقل من غراب.',link:'القصة في المائدة في سياق آيات القتل لتُؤسّس: قتل نفس = قتل الناس جميعاً.'},
+
+  {id:'nuh',cat:'qabla',name:'سيدنا نوح عليه السلام',surahs:['هود','المؤمنون','القمر','نوح'],
+   ayah:'﴿رَبِّ إِنِّي دَعَوْتُ قَوْمِي لَيْلًا وَنَهَارًا فَلَمْ يَزِدْهُمْ دُعَائِي إِلَّا فِرَارًا﴾',ref:'نوح: 5–6',
+   teaser:'950 سنة من الصبر — وطوفان لم يُبقِ إلا المؤمنين',
+   summary:'نوح دعا قومه 950 سنة بكل أسلوب فلم يؤمن معه إلا قليل. بنى السفينة فسخروا منه. الطوفان أغرق الأرض بأسرها. ابنه رفض ركوب السفينة فغرق.',
+   stages:[
+     {title:'الدعوة 950 سنة بكل أسلوب',hint:'ما الأساليب التي جرّبها نوح؟',chars:['نوح','قومه'],ayah:'﴿ثُمَّ إِنِّي دَعَوْتُهُمْ جِهَارًا ثُمَّ إِنِّي أَعْلَنتُ لَهُمْ وَأَسْرَرْتُ لَهُمْ إِسْرَارًا﴾',ayah_ref:'نوح: 8–9',detail:'950 سنة من الدعوة: سرية للأفراد، علنية للجماعات، علنية للملأ. قدّم لهم الحجج العقلية في الكون والمطر والنبات والإنسان. كل أسلوب أفضى لمزيد من الفرار. التعب موجود لكن اليأس غائب.',note:'المداومة على الدعوة دون يأس بصرف النظر عن النتائج هي أساس الإيمان بالرسالة. النتائج من الله.'},
+     {title:'بناء السفينة في البرّ والسخرية',hint:'كيف واجه نوح سخرية قومه وهو يبني؟',chars:['نوح','قومه'],ayah:'﴿وَيَصْنَعُ الْفُلْكَ وَكُلَّمَا مَرَّ عَلَيْهِ مَلَأٌ مِّن قَوْمِهِ سَخِرُوا مِنْهُ﴾',ayah_ref:'هود: 38',detail:'بنى نوح السفينة في الصحراء بعيداً عن البحر. الناس يمرون ويسخرون: "نبي يبني قارباً في البرّ؟". أجابهم: "إن تسخروا منا فإنا نسخر منكم كما تسخرون". العمل الصامت في وجه السخرية نوع من الصبر الأعلى.',note:'نوح لم يوقف البناء بسبب السخرية. الصحيح: ابنِ ما أُمرت ببنائه واترك السخرية للتاريخ.'},
+     {title:'الطوفان وغرق الأرض',hint:'كيف جاء الطوفان وما حجمه الحقيقي؟',chars:['نوح','المؤمنون','الكافرون'],ayah:'﴿فَفَتَحْنَا أَبْوَابَ السَّمَاءِ بِمَاءٍ مُّنْهَمِرٍ وَفَجَّرْنَا الْأَرْضَ عُيُونًا﴾',ayah_ref:'القمر: 11–12',detail:'من مصدرين في وقت واحد: السماء انفجرت مطراً غزيراً والأرض انبثق منها الماء من كل مكان. التقى الماءان على أمر محكم. غمرت المياه كل الأرض حتى الجبال. كان حكماً كونياً بعد 950 سنة من الإعذار.',note:'الطوفان لم يكن نزوة إلهية — جاء بعد استكمال الإعذار. العدل الإلهي لا يُعجَّل ولا يُؤجَّل بعد تمام الحجة.'},
+     {title:'ابن نوح يرفض السفينة',hint:'ما قصة ابن نوح ودرسها؟',chars:['نوح','ابنه'],ayah:'﴿قَالَ سَآوِي إِلَىٰ جَبَلٍ يَعْصِمُنِي مِنَ الْمَاءِ قَالَ لَا عَاصِمَ الْيَوْمَ مِنْ أَمْرِ اللَّهِ إِلَّا مَن رَّحِمَ﴾',ayah_ref:'هود: 43',detail:'نادى نوح ابنه: "اركب معنا ولا تكن مع الكافرين". ردّ الابن بثقة الجاهل: "سآوي إلى جبل يعصمني". ظن أن القوة المادية تنجي من قدر الله. حال الموج بينهما. قال نوح: "لا عاصم اليوم من أمر الله إلا من رحم".',note:'أقرب الناس إليك لا يُغني عنك أمام الله. الجبل المادي لا يحمي من قدر الله. النجاة في ركوب سفينة الله الواحدة.'},
+   ],
+   surah_details:[{n:'هود (25-49)',d:'الأشمل: الطوفان وغرق الابن'},{n:'سورة نوح (كاملة)',d:'مذكرات نوح بلسانه'},{n:'القمر (9-16)',d:'التكذيب والطوفان والعقوبة'}],
+   lesson:'الصبر على الدعوة بعدم اليأس. القرابة لا تنفع بلا إيمان. النجاة في ركوب سفينة الله.',link:'سورة نوح هي مذكراته بلسانه. هود تُضيف الدراما. القمر تُركّز على عقوبة التكذيب.'},
+
+  {id:'hud',cat:'qabla',name:'هود عليه السلام وقوم عاد',surahs:['الأعراف','هود','الأحقاف','الحاقة'],
+   ayah:'﴿أَتَبْنُونَ بِكُلِّ رِيعٍ آيَةً تَعْبَثُونَ﴾',ref:'الشعراء: 128',
+   teaser:'أقوى أمة في زمانها أهلكها الله بريح صرصر في 8 أيام',
+   summary:'عاد أقوى أمة في زمانهم — حجتهم "من أشدّ منا قوة؟". بنوا ناطحات السحاب خيلاءً. جاءهم هود يدعو للتوحيد فسخروا. رأوا سحابة ففرحوا ظناً أنها مطر. كانت ريحاً صرصراً محوتهم في 8 أيام.',
+   stages:[
+     {title:'قوة عاد وغرورهم',hint:'ما حجم قوة عاد وكيف تحوّلت لغرور؟',chars:['عاد','هود'],ayah:'﴿وَاذْكُرْ أَخَا عَادٍ إِذْ أَنذَرَ قَوْمَهُ بِالْأَحْقَافِ﴾',ayah_ref:'الأحقاف: 21',detail:'كان قوم عاد في الأحقاف (اليمن) أضخم الناس أجساداً وأشدّهم قوةً. بنوا على كل ربوة آية (بناءً ضخماً) عبثاً وتفاخراً. قالوا: "من أشدّ منا قوة؟". لم يعلموا أن الله الذي خلقهم أشدّ منهم قوةً.',note:'الغرور بالقوة المادية يُنسي مصدر هذه القوة. القوة مَنحة من الله — الشكر لا الكبر هو الواجب.'},
+     {title:'دعوة هود ورفض عاد',hint:'كيف كانت حجج عاد في رفض هود؟',chars:['هود','عاد'],ayah:'﴿قَالُوا يَا هُودُ مَا جِئْتَنَا بِبَيِّنَةٍ وَمَا نَحْنُ بِتَارِكِي آلِهَتِنَا عَن قَوْلِكَ﴾',ayah_ref:'هود: 53',detail:'قال هود لقومه: "اعبدوا الله ما لكم من إله غيره — إن أنتم إلا مفترون". ردّوا برفض قاطع: "لن نترك آلهتنا بمجرد قولك". حجتهم مثلثة: لم تأتنا معجزة واضحة، وآباؤنا كانوا على هذا الدين، وأنت مثلنا.',note:'الحجج الثلاث لرفض الحق مكررة في كل عصر: لا دليل / الآباء / أنت بشر. لم تتغير.'},
+     {title:'رؤية السحابة والفرح الغافل',hint:'ما الدراما الكبرى في لحظة الهلاك؟',chars:['عاد'],ayah:'﴿فَلَمَّا رَأَوْهُ عَارِضًا مُّسْتَقْبِلَ أَوْدِيَتِهِمْ قَالُوا هَٰذَا عَارِضٌ مُّمْطِرُنَا﴾',ayah_ref:'الأحقاف: 24',detail:'رأوا سحابة قادمة نحوهم ففرحوا: "هذا عارض ممطرنا — جاء المطر!". هذا هو الإبداع القرآني في الدراما: لحظة واحدة بين الفرح والهلاك. قال الله: "بل هو ما استعجلتم به — ريح فيها عذاب أليم".',note:'الهلاك يأتي أحياناً في صورة ما تتمنى. الغافل عن الله لا يُميّز بين النعمة والنقمة.'},
+     {title:'الريح الصرصر 7 ليالٍ و8 أيام',hint:'كيف كان الهلاك وماذا بقي منهم؟',chars:['عاد'],ayah:'﴿سَخَّرَهَا عَلَيْهِمْ سَبْعَ لَيَالٍ وَثَمَانِيَةَ أَيَّامٍ حُسُومًا فَتَرَى الْقَوْمَ فِيهَا صَرْعَىٰ كَأَنَّهُمْ أَعْجَازُ نَخْلٍ خَاوِيَةٍ﴾',ayah_ref:'الحاقة: 7',detail:'ريح صرصر (شديدة البرد الحارق) 7 ليالٍ و8 أيام متواصلة. كانت تُلقيهم على وجوههم "كأعجاز نخل خاوية" — أجساد بلا رؤوس مثل جذوع النخل الفارغة. أبقى الله أثرهم عبرةً.',note:'أقوى الأجساد سقطت أمام ريح واحدة. القوة المادية لا وزن لها أمام قدرة الله حين يُريد.'},
+   ],
+   surah_details:[{n:'الأحقاف (21-26)',d:'الريح التي ظنوها مطراً'},{n:'الحاقة (6-8)',d:'وصف الريح والمحو الكامل'},{n:'هود (50-60)',d:'الحوار والحجة'}],
+   lesson:'القوة المادية لا تحمي من عذاب الله. الغرور بالبنيان دون شكر طريق الزوال.',link:'الحاقة وصفت الريح. الأحقاف أظهرت الدراما: الريح التي ظنوها مطراً.'},
+
+  {id:'salih',cat:'qabla',name:'صالح عليه السلام وقوم ثمود',surahs:['هود','الشعراء','الشمس'],
+   ayah:'﴿هَٰذِهِ نَاقَةُ اللَّهِ لَكُمْ آيَةً فَذَرُوهَا تَأْكُلْ فِي أَرْضِ اللَّهِ﴾',ref:'الأعراف: 73',
+   teaser:'ناقة معجزة عقروها — وجاء الهلاك بعد ثلاثة أيام بالتحديد',
+   summary:'ثمود نحتوا البيوت في الجبال. جاءهم صالح بالناقة آية. حذّرهم من عقرها. عقروها بقرار جماعي. قال لهم: "تمتعوا ثلاثة أيام". في اليوم الرابع الصيحة.',
+   stages:[
+     {title:'ثمود في الحجر ونحت الجبال',hint:'ما حضارة ثمود وما الذي أبطرتهم؟',chars:['ثمود','صالح'],ayah:'﴿وَكَانُوا يَنْحِتُونَ مِنَ الْجِبَالِ بُيُوتًا آمِنِينَ﴾',ayah_ref:'الحجر: 82',detail:'ثمود كانوا في منطقة الحجر (مدائن صالح شمال الجزيرة العربية). نحتوا البيوت في الجبال الصخرية الشاهقة — فنّ معماري رائع. هذا الاطمئنان لقوة بيوتهم الصخرية أبطرهم وجعلهم يعصون.',note:'حين يشعر الإنسان بأمان مادي كامل يميل للاستغناء عن الله. الجبل الصخري أومنهم من عذاب الله.'},
+     {title:'الناقة المعجزة وشرط السلامة',hint:'ما المعجزة الكبرى في الناقة؟',chars:['صالح','ثمود','الناقة'],ayah:'﴿وَلَا تَمَسُّوهَا بِسُوءٍ فَيَأْخُذَكُمْ عَذَابٌ قَرِيبٌ﴾',ayah_ref:'هود: 64',detail:'جاء صالح بناقة معجزة خرجت من الصخر بأمر الله. كانت تأكل وتُعطي حليباً وفيراً يكفي القرية كلها. شرط صالح صريح: لا تمسّوها بسوء — ولها يوم تشرب فيه ولكم يوم. التوازن العادل بين الناس والآية.',note:'المعجزة الملموسة التي تخدم الناس يومياً (حليب وفير) لم تُقنعهم. الهداية لا تُفرض بالمعجزة.'},
+     {title:'العقر الجماعي والقرار المشترك',hint:'لماذا كان العقر جماعياً وما أهمية ذلك؟',chars:['ثمود — أشقاهم'],ayah:'﴿فَعَقَرُوهَا فَقَالَ تَمَتَّعُوا فِي دَارِكُمْ ثَلَاثَةَ أَيَّامٍ﴾',ayah_ref:'هود: 65',detail:'القرآن في سورة الشمس يقول: "إذ انبعث أشقاها" — رجل واحد انبعث للعقر. لكن القرآن في مواضع أخرى يقول "فعقروها" بالجمع. لأن القبيلة قرّرت جماعياً وأرسلت من ينفّذ. الجريمة الجماعية تحمل العقوبة الجماعية.',note:'الصمت على الجريمة وعدم المعارضة شراكة فيها. "فعقروها" — كلهم مسؤولون.'},
+     {title:'الصيحة في اليوم الرابع',hint:'كيف كانت الصيحة وما طبيعتها؟',chars:['ثمود'],ayah:'﴿فَأَخَذَتْهُمُ الصَّيْحَةُ مُصْبِحِينَ فَمَا أَغْنَىٰ عَنْهُمْ مَّا كَانُوا يَكْسِبُونَ﴾',ayah_ref:'الحجر: 83',detail:'قال لهم صالح: "تمتعوا في داركم ثلاثة أيام". المهلة رحمة ووقت للتوبة. لم يتوبوا. في اليوم الرابع صباحاً جاءت الصيحة. لم تُغنِ عنهم بيوتهم المنحوتة في الجبال ولا ثرواتهم. محوتهم كأن لم يكونوا.',note:'"فما أغنى عنهم ما كانوا يكسبون" — كل ثروة ومادة وحضارة لم تُجدِ أمام قدرة الله.'},
+   ],
+   surah_details:[{n:'هود (61-68)',d:'الناقة وتحذير صالح والهلاك'},{n:'الشمس (11-15)',d:'أقصر رواية — لحظة العقر'},{n:'الشعراء (141-158)',d:'الحوار الكامل مع القوم'}],
+   lesson:'المعجزة الملموسة لا تُجبر على الإيمان. الجريمة الجماعية تحمل عقوبة جماعية.',link:'الشمس ركّزت على لحظة القرار في آيتين. هود وسّعت الحوار والتفاصيل.'},
+
+  {id:'lut',cat:'qabla',name:'لوط عليه السلام وقوم سدوم',surahs:['الأعراف','هود','الحجر','الشعراء','الصافات'],
+   ayah:'﴿إِنَّكُمْ لَتَأْتُونَ الْفَاحِشَةَ مَا سَبَقَكُم بِهَا مِنْ أَحَدٍ مِّنَ الْعَالَمِينَ﴾',ref:'الأعراف: 80',
+   teaser:'قوم ابتدعوا فاحشة لم يسبقهم أحد — قُلبت مدنهم رأساً على عقب',
+   summary:'لوط ابن أخي إبراهيم أُرسل لقوم سدوم الذين ابتدعوا فاحشة لم يسبقهم بها أحد. جاء الملائكة في صورة ضيوف فأراد القوم الفاحشة بهم. أُمر لوط بالخروج ليلاً. فجراً قُلبت المدن.',
+   stages:[
+     {title:'دعوة لوط لقوم سدوم',hint:'ما طبيعة الدعوة وما الجريمة المحددة؟',chars:['لوط','قوم سدوم'],ayah:'﴿وَلُوطًا إِذْ قَالَ لِقَوْمِهِ أَتَأْتُونَ الْفَاحِشَةَ مَا سَبَقَكُم بِهَا مِنْ أَحَدٍ مِّنَ الْعَالَمِينَ﴾',ayah_ref:'الأعراف: 80',detail:'لوط ابن أخي إبراهيم هاجر معه ثم أُرسل لقوم سدوم. كانوا قد ابتدعوا فاحشة لم يعرفها العالم قبلهم. دعاهم للتوبة وقال لهم صريحاً ما يفعلون. لم يُداهن ولم يُلمّح.',note:'الوضوح في الدعوة فضيلة حتى حين يكون الموضوع صعباً. لوط قال الحقيقة بلا التواء.'},
+     {title:'مجيء الملائكة في صورة ضيوف',hint:'ما الاختبار الأخير لقوم لوط؟',chars:['لوط','الملائكة','قوم سدوم'],ayah:'﴿وَلَمَّا جَاءَتْ رُسُلُنَا لُوطًا سِيءَ بِهِمْ وَضَاقَ بِهِمْ ذَرْعًا﴾',ayah_ref:'هود: 77',detail:'جاء الملائكة في صورة شباب وسيمين. حين رآهم لوط ضاق لأنه يعرف قومه. جاء القوم مسرعين يطلبون الفاحشة. حاول لوط الدفاع عن ضيوفه بكل طريقة. أعلمه الملائكة أنهم رسل الله وأن الهلاك قادم.',note:'الضيف أمانة والدفاع عنه واجب. لوط قدّم كل شيء دفاعاً عن ضيوفه حتى عُرفت فضيلته.'},
+     {title:'الخروج الليلي ووصية لا تلتفت',hint:'لماذا أُمروا بعدم الالتفات؟',chars:['لوط','ابنتاه','امرأته'],ayah:'﴿فَأَسْرِ بِأَهْلِكَ بِقِطْعٍ مِّنَ اللَّيْلِ وَلَا يَلْتَفِتْ مِنكُمْ أَحَدٌ إِلَّا امْرَأَتَكَ﴾',ayah_ref:'هود: 81',detail:'أُمر لوط بالخروج مع أهله ليلاً بسرعة وبدون صوت ولا التفات. استثني امرأته — كانت تعاطف مع قومها. الالتفات ممنوع: من لا يُغلق باباً على الماضي لا يُكمل طريق المستقبل.',note:'الهجرة الكاملة بالقلب وليس بالجسد فقط. من التفتت امرأة لوط التفت قلبها وليس فقط رأسها.'},
+     {title:'قلب المدن والمطر بحجارة',hint:'كيف كان الهلاك وما خصوصيته؟',chars:['قوم سدوم'],ayah:'﴿فَجَعَلْنَا عَالِيَهَا سَافِلَهَا وَأَمْطَرْنَا عَلَيْهَا حِجَارَةً مِّن سِجِّيلٍ﴾',ayah_ref:'هود: 82',detail:'رُفعت المدن برمّتها إلى السماء ثم قُلبت رأساً على عقب، وأُمطرت بحجارة من سجّيل (طين مُحرق). هلاك مزدوج: القلب ثم الحجارة. أُعلن هذا الهلاك ليكون آية مقروءة للأجيال.',note:'عقوبة استثنائية لجريمة استثنائية لم يسبق لها مثيل. الله يُناسب بين الجريمة وعقوبتها.'},
+   ],
+   surah_details:[{n:'هود (77-83)',d:'الملائكة وقلب المدن'},{n:'الصافات (133-138)',d:'نجاة لوط وخسارة امرأته'}],
+   lesson:'الوضوح في الدعوة فضيلة. الضيف أمانة. الهجرة الحقيقية بالقلب وليس بالجسد فقط.',link:'هود الأطول والأشمل. الصافات تُضيف نجاة لوط وخسارة امرأته.'},
+
+  /* ===== إبراهيم وذريته ===== */
+  {id:'ibrahim',cat:'ibrahim',name:'إبراهيم عليه السلام',surahs:['الأنعام','الأنبياء','الصافات','إبراهيم'],
+   ayah:'﴿إِنِّي وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا﴾',ref:'الأنعام: 79',
+   teaser:'من تأمّل النجوم للتوحيد — والنار البردة وسكين الذبح',
+   summary:'إبراهيم بدأ بالعقل: تأمّل النجوم والقمر والشمس فخلص للتوحيد. حطّم الأصنام وأُلقي في النار فكانت برداً وسلاماً. هاجر بهاجر وإسماعيل لمكة. واجه اختبار الذبح فاجتازه. بنى الكعبة.',
+   stages:[
+     {title:'رحلة العقل من النجوم للتوحيد',hint:'كيف وصل إبراهيم للتوحيد بالعقل وحده؟',chars:['إبراهيم الشاب'],ayah:'﴿فَلَمَّا جَنَّ عَلَيْهِ اللَّيْلُ رَأَىٰ كَوْكَبًا قَالَ هَٰذَا رَبِّي فَلَمَّا أَفَلَ قَالَ لَا أُحِبُّ الْآفِلِينَ﴾',ayah_ref:'الأنعام: 76',detail:'جلس إبراهيم يراقب الكون ليلاً. نجم لامع فأفل. قمر فأفل. شمس مضيئة فغابت. خلص: كل ما يغيب لا يصلح رباً. الربّ يجب أن يكون دائماً لا يأفل ولا يغيب. هذا التأمّل العقلي الخالص قصة "الفطرة" التي أودعها الله في كل إنسان.',note:'العقل السليم يُفضي للتوحيد. لا أحد يُولد على الشرك — الشرك يُكتسب.'},
+     {title:'تحطيم الأصنام والمواجهة',hint:'كيف واجه إبراهيم أباه وقومه؟',chars:['إبراهيم','أبوه آزر','قومه'],ayah:'﴿قَالَ أَفَرَأَيْتُم مَّا كُنتُمْ تَعْبُدُونَ أَنتُمْ وَآبَاؤُكُمُ الْأَقْدَمُونَ فَإِنَّهُمْ عَدُوٌّ لِّي إِلَّا رَبَّ الْعَالَمِينَ﴾',ayah_ref:'الشعراء: 75-77',detail:'حطّم إبراهيم كل الأصنام إلا الكبير وعلّق الفأس في عنقه. لما سألوه قال: "اسألوا كبيرهم". لما احتجّوا قال: "أتعبدون ما تنحتون؟". الحجة دامغة: الصنم الذي صنعه الإنسان لا يُعبَد.',note:'إبراهيم لم يكسر الأصنام انتقاماً — كسرها إثباتاً بالفعل: هذه الأصنام لا تدفع الأذى عن نفسها.'},
+     {title:'الإلقاء في النار والنجاة المعجزة',hint:'كيف واجه إبراهيم النار ولم تحرقه؟',chars:['إبراهيم','الملك نمرود'],ayah:'﴿قُلْنَا يَا نَارُ كُونِي بَرْدًا وَسَلَامًا عَلَىٰ إِبْرَاهِيمَ﴾',ayah_ref:'الأنبياء: 69',detail:'أوقدوا ناراً ضخمة وقذفوه فيها. في تلك اللحظة جاء جبريل يسأل: "هل لك حاجة؟". قال إبراهيم: "أما منك فلا". أمر الله النار: "كوني برداً وسلاماً". برداً لا تحرق. سلاماً لا تؤذي.',note:'"أما منك فلا" — التوكل الكامل على الله. إبراهيم توكّل فكفاه الله ما لا يخطر على بال.'},
+     {title:'هجرة هاجر وإسماعيل لمكة',hint:'ما قصة ترك هاجر وإسماعيل في الصحراء؟',chars:['إبراهيم','هاجر','إسماعيل الرضيع'],ayah:'﴿رَّبَّنَا إِنِّي أَسْكَنتُ مِن ذُرِّيَّتِي بِوَادٍ غَيْرِ ذِي زَرْعٍ عِندَ بَيْتِكَ الْمُحَرَّمِ﴾',ayah_ref:'إبراهيم: 37',detail:'أمر الله إبراهيم بأخذ هاجر ورضيعها لصحراء مكة. تركهما مع تمر وماء ومضى. سألته هاجر: "هل الله أمرك؟" فقال: نعم. قالت: "إذاً لن يضيّعنا". ركضت بين الصفا والمروة سبعاً. نبع زمزم.',note:'هاجر سألت سؤالاً واحداً: "هل الله أمرك؟". الثقة المطلقة بأمر الله هي أساس كل توكل.'},
+     {title:'اختبار الذبح والتسليم الكامل',hint:'كيف كان اختبار الذبح وما الحكمة؟',chars:['إبراهيم','إسماعيل'],ayah:'﴿فَلَمَّا أَسْلَمَا وَتَلَّهُ لِلْجَبِينِ وَنَادَيْنَاهُ أَن يَا إِبْرَاهِيمُ قَدْ صَدَّقْتَ الرُّؤْيَا﴾',ayah_ref:'الصافات: 103-105',detail:'رأى إبراهيم رؤيا أنه يذبح ابنه. عرض الأمر على إسماعيل فقال: "ستجدني من الصابرين". حين وضع السكين وأسلما جاء النداء: "يا إبراهيم قد صدّقت الرؤيا". فُدي إسماعيل بكبش عظيم.',note:'التسليم التام هو أن تُسلّم ما تُحبّ أكثر شيء. إسماعيل لم يُجبَر — قال "ستجدني من الصابرين" باختياره.'},
+     {title:'بناء الكعبة والدعاء للأمة',hint:'ماذا دعا إبراهيم حين بنى الكعبة؟',chars:['إبراهيم','إسماعيل'],ayah:'﴿رَبَّنَا تَقَبَّلْ مِنَّا وَاجْعَلْنَا مُسْلِمَيْنِ لَكَ وَمِن ذُرِّيَّتِنَا أُمَّةً مُّسْلِمَةً﴾',ayah_ref:'البقرة: 127-128',detail:'رفع إبراهيم وإسماعيل القواعد من البيت. كان الدعاء على الشفاه في كل لحظة: "ربنا تقبّل منا". ثم دعا لأمة ستأتي من بعده: "وابعث فيهم رسولاً منهم". دعاء إبراهيم هو الذي استجاب الله له بإرسال محمد ﷺ.',note:'إبراهيم بنى البيت لله وطلب لأمة لن يراها. الحضارة الإيمانية تبنيها الأجيال السابقة للقادمين.'},
+   ],
+   surah_details:[{n:'الأنعام (74-83)',d:'رحلة العقل للتوحيد'},{n:'الأنبياء (51-73)',d:'تحطيم الأصنام والنار'},{n:'الصافات (99-113)',d:'رؤيا الذبح واجتيازها'},{n:'إبراهيم (كاملة)',d:'الدعاء لمكة والأمة'}],
+   lesson:'التوحيد يبدأ بالعقل. الهجرة في سبيل الله تبني حضارات. التسليم لله في أصعب اللحظات أعلى مقامات الإيمان.',link:'كل سورة تُضيء زاوية: الأنعام=العقل، الأنبياء=الشجاعة، الصافات=التسليم، إبراهيم=الدعاء.'},
+
+  {id:'yusuf',cat:'ibrahim',name:'يوسف عليه السلام',surahs:['يوسف (كاملة)'],
+   ayah:'﴿نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ﴾',ref:'يوسف: 3',
+   teaser:'من قاع البئر إلى عرش مصر — أحسن القصص في 111 آية',
+   summary:'رأى يوسف رؤيا فحسده إخوته وألقوه في البئر وباعوه. في مصر راودته امرأة العزيز فرفض فسُجن. في السجن أوّل الأحلام. أُخرج فأصبح وزير مصر. جاء إخوته فعفا عنهم.',
+   stages:[
+     {title:'رؤيا يوسف وحسد الإخوة',hint:'ما الرؤيا وكيف بدأ الحسد؟',chars:['يوسف','يعقوب','الإخوة'],ayah:'﴿إِذْ قَالَ يُوسُفُ لِأَبِيهِ يَا أَبَتِ إِنِّي رَأَيْتُ أَحَدَ عَشَرَ كَوْكَبًا وَالشَّمْسَ وَالْقَمَرَ رَأَيْتُهُمْ لِي سَاجِدِينَ﴾',ayah_ref:'يوسف: 4',detail:'رأى يوسف الصغير رؤيا: 11 كوكباً والشمس والقمر يسجدون له. حذّره أبوه من قصّها على إخوته. لكن بمجرد علم الإخوة بمكانة يوسف عند أبيهم اشتعل الحسد: "ليوسف وأخوه أحبّ إلى أبينا منا".',note:'الرؤيا كانت بداية القصة ونهايتها — "يا أبتِ هذا تأويل رؤياي". الله يُعطيك الخاتمة أولاً ثم يُكمل الرحلة.'},
+     {title:'البئر والبيع والكذبة',hint:'كيف تآمر الإخوة وماذا أخبروا أباهم؟',chars:['الإخوة','يوسف','يعقوب'],ayah:'﴿فَلَمَّا ذَهَبُوا بِهِ وَأَجْمَعُوا أَن يَجْعَلُوهُ فِي غَيَابَتِ الْجُبِّ وَأَوْحَيْنَا إِلَيْهِ لَتُنَبِّئَنَّهُم بِأَمْرِهِمْ هَٰذَا﴾',ayah_ref:'يوسف: 15',detail:'ألقوه في البئر. في اللحظة الأشد خوفاً أوحى الله ليوسف تطميناً: ستأتي اللحظة التي تواجههم فيها. مرّت قافلة فأخرجوه وباعوه بثمن بخس. رجعوا لأبيهم بقميصه الملطّخ بدم كذب.',note:'في أحلك اللحظات أوحى الله لطفل في البئر وعداً بالمستقبل. الله لا يترك عبده في الظلمة دون تطمين.'},
+     {title:'منزل العزيز والمراودة والرفض',hint:'ما الاختبار الصعب في بيت العزيز؟',chars:['يوسف','امرأة العزيز'],ayah:'﴿وَغَلَّقَتِ الْأَبْوَابَ وَقَالَتْ هَيْتَ لَكَ قَالَ مَعَاذَ اللَّهِ إِنَّهُ رَبِّي أَحْسَنَ مَثْوَايَ﴾',ayah_ref:'يوسف: 23',detail:'اشتراه العزيز فأكرمه. راودته امرأته وأغلقت الأبواب. قال: "معاذ الله — إنه ربي أحسن مثواي". سُجن ظلماً بعد أن شهدت الشواهد ببراءته.',note:'"معاذ الله" — الاستعاذة بالله لا الاستعلاء بالقوة الذاتية. الفرار من الفتنة أكبر مقامات التقوى.'},
+     {title:'السجن ودعوة وتأويل الأحلام',hint:'كيف حوّل يوسف السجن إلى منبر؟',chars:['يوسف','سجناء','صاحبا السجن'],ayah:'﴿يَا صَاحِبَيِ السِّجْنِ أَأَرْبَابٌ مُّتَفَرِّقُونَ خَيْرٌ أَمِ اللَّهُ الْوَاحِدُ الْقَهَّارُ﴾',ayah_ref:'يوسف: 39',detail:'دخل السجن ظلماً. لم يجلس يبكي — بدأ يُعلّم ويدعو. حين طلب الشابان تأويل أحلامهما بدأ بالدعوة أولاً. أوّل حلميهما بدقة.',note:'السجن الظالم لم يوقف دعوة يوسف. المؤمن يجعل من كل مكان منبراً للحق.'},
+     {title:'رؤيا الملك والخروج الكريم',hint:'كيف اشترط يوسف التبرئة قبل الخروج؟',chars:['يوسف','الملك'],ayah:'﴿قَالَ ارْجِعْ إِلَىٰ رَبِّكَ فَاسْأَلْهُ مَا بَالُ النِّسْوَةِ اللَّاتِي قَطَّعْنَ أَيْدِيَهُنَّ﴾',ayah_ref:'يوسف: 50',detail:'لما أُرسل إليه لتأويل رؤيا الملك رفض الخروج فوراً. طلب أولاً تبرئة اسمه. لن يخرج مظلوماً. جمع الملك النسوة فشهدن ببراءته.',note:'يوسف أبى أن يخرج من السجن دون استيفاء كرامته. الكرامة لا تُساوم على حساب الحرية.'},
+     {title:'العفو الكامل واكتمال الرؤيا',hint:'ما اللحظة الأعظم في القصة؟',chars:['يوسف','الإخوة','يعقوب'],ayah:'﴿قَالَ لَا تَثْرِيبَ عَلَيْكُمُ الْيَوْمَ يَغْفِرُ اللَّهُ لَكُمْ وَهُوَ أَرْحَمُ الرَّاحِمِينَ﴾',ayah_ref:'يوسف: 92',detail:'"لا تثريب عليكم اليوم" — لا عتاب ولا لوم ولا ثأر. أرسل بقميصه فارتدّ يعقوب بصيراً. جاء الأب والإخوة. سجدوا. قال: "يا أبتِ هذا تأويل رؤياي من قبل". دائرة اكتملت.',note:'"لا تثريب" — العظماء لا يُحاسبون حين يملكون القوة. يوسف مَلَك وعفا. هذا الفرق بين الملك والمَلَك.'},
+   ],
+   surah_details:[{n:'يوسف (كاملة)',d:'الوحيدة بقصة كاملة من أولها لآخرها في سورة واحدة'}],
+   lesson:'كل ابتلاء كان درجة أعلى ليوسف. الصبر مفتاح القيادة. العفو عن المسيئين سمة العظماء.',link:'يوسف استثنائية — الوحيدة بقصة كاملة. كأن الله أراد أن تُقرأ متواصلة.'},
+
+  /* ===== موسى وبنو إسرائيل ===== */
+  {id:'musa',cat:'musa',name:'موسى عليه السلام',surahs:['طه','القصص','الشعراء','الأعراف'],
+   ayah:'﴿وَكَلَّمَ اللَّهُ مُوسَىٰ تَكْلِيمًا﴾',ref:'النساء: 164',
+   teaser:'أكثر الأنبياء ذكراً في القرآن — من قصر فرعون لشق البحر',
+   summary:'وُلد في زمن ذبح فرعون الأطفال فألقته أمه في النهر. كبر في القصر. قتل رجلاً خطأً فهرب لمدين. سمع كلام الله عند الطور. واجه فرعون. انشق البحر وغرق فرعون.',
+   stages:[
+     {title:'الميلاد والإلقاء في النهر',hint:'كيف نجا موسى من الإعدام؟',chars:['أم موسى','موسى الرضيع','آسيا امرأة فرعون'],ayah:'﴿وَأَوْحَيْنَا إِلَىٰ أُمِّ مُوسَىٰ أَنْ أَرْضِعِيهِ فَإِذَا خِفْتِ عَلَيْهِ فَأَلْقِيهِ فِي الْيَمِّ﴾',ayah_ref:'القصص: 7',detail:'أمر فرعون بذبح كل مولود ذكر من بني إسرائيل. أوحى الله لأم موسى: "ألقيه في النهر ولا تخافي ولا تحزني". ألقته وهي تثق بوعد الله. التقطه آل فرعون — عدو موسى يُرضع عدوه!',note:'"ألقيه في النهر" — أشد تعليمات الله صعوبةً. لكن الثقة جعلت أم موسى تُلقي ابنها بيدها. هذا التوكل الحقيقي.'},
+     {title:'الطفولة في القصر والعودة لأمه',hint:'كيف عاد موسى لأمه وهو في قصر فرعون؟',chars:['موسى الرضيع','أخته','أم موسى'],ayah:'﴿وَحَرَّمْنَا عَلَيْهِ الْمَرَاضِعَ مِن قَبْلُ فَقَالَتْ هَلْ أَدُلُّكُمْ عَلَىٰ أَهْلِ بَيْتٍ يَكْفُلُونَهُ﴾',ayah_ref:'القصص: 12',detail:'حرّم الله على موسى الرضاعة من غير أمه — رفض كل مراضع القصر. جاءت أخته وعرضت أهل بيت. رجع موسى لأمه يرضع في بيتها وهو رسمياً في رعاية فرعون.',note:'الله ردّ الطفل لأمه عبر سلسلة أحداث طبيعية — الجوع وأخت تراقب. الله يستخدم الأسباب الطبيعية لتحقيق وعوده.'},
+     {title:'القتل والهرب لمدين والزواج',hint:'كيف كانت مدين مدرسة تدريب لموسى؟',chars:['موسى','شعيب النبي','ابنتا شعيب'],ayah:'﴿قَالَتْ إِحْدَاهُمَا يَا أَبَتِ اسْتَأْجِرْهُ إِنَّ خَيْرَ مَنِ اسْتَأْجَرْتَ الْقَوِيُّ الْأَمِينُ﴾',ayah_ref:'القصص: 26',detail:'قتل موسى رجلاً خطأً واستغفر فوراً. هرب لمدين. سقى للفتاتين لوجه الله دون انتظار أجر. تزوّج ابنة شعيب وعاش 10 سنوات يرعى الغنم — تدريب نبوي على الصبر والرعاية.',note:'الإحسان دون انتظار أجر يفتح أبواباً لا تُفتح بالسعي. موسى سقى فأُعطي الزوجة والمأوى والعمل.'},
+     {title:'سماع كلام الله عند الطور والبعثة',hint:'ما الذي حدث عند طور سيناء؟',chars:['موسى','الله تعالى'],ayah:'﴿فَلَمَّا أَتَاهَا نُودِيَ يَا مُوسَىٰ إِنِّي أَنَا رَبُّكَ فَاخْلَعْ نَعْلَيْكَ﴾',ayah_ref:'طه: 11-12',detail:'في ليلة باردة رأى موسى ناراً فذهب يقتبس منها. نُودي باسمه: "يا موسى إني أنا ربك". أُمر بخلع نعليه تعظيماً. أُعطي معجزتين وأُخبر بمهمته: "اذهب إلى فرعون إنه طغى".',note:'الله اختار لحظة الاسترخاء ليُبعث موسى. الله يأخذ بيدك حين تكون ساعياً في عمل بسيط.'},
+     {title:'مواجهة فرعون والسحرة',hint:'كيف كانت المواجهة الكبرى مع فرعون؟',chars:['موسى','هارون','فرعون','السحرة'],ayah:'﴿فَأَلْقَىٰ عَصَاهُ فَإِذَا هِيَ تَلْقَفُ مَا يَأْفِكُونَ﴾',ayah_ref:'الأعراف: 117',detail:'استدعى فرعون أكبر السحرة. حين ألقى موسى عصاه ابتلعت كل ما صنعوا. فوقع السحرة ساجدين: "آمنا برب العالمين رب موسى وهارون".',note:'إيمان السحرة كان الإفلاس الكامل لفرعون — عقلاء العلم في عصره آمنوا. لم يبقَ لفرعون إلا البطش.'},
+     {title:'انشقاق البحر وغرق فرعون',hint:'ما اللحظة الأعظم في قصة موسى؟',chars:['موسى','بنو إسرائيل','فرعون وجيشه'],ayah:'﴿فَانفَلَقَ فَكَانَ كُلُّ فِرْقٍ كَالطَّوْدِ الْعَظِيمِ﴾',ayah_ref:'الشعراء: 63',detail:'أحاط فرعون ببني إسرائيل والبحر أمامهم. قال موسى: "إن معي ربي سيهدين". ضرب البحر بعصاه فانفلق. عبروا يابساً. دخل فرعون خلفهم فأطبق البحر عليه.',note:'"إن معي ربي سيهدين" — قالها موسى حين يرى الموت مؤكداً. الإيمان ليس حين الأمان — بل حين يُقطع الطريق.'},
+   ],
+   surah_details:[{n:'القصص (1-43)',d:'السيرة الكاملة'},{n:'طه (9-98)',d:'البعثة والمواجهة'},{n:'الشعراء (10-68)',d:'السحرة والخروج'}],
+   lesson:'الله يُربّي أنبياءه في بيت أعدائهم. الثقة بالله تُشقّ بها البحار.',link:'القصص = السيرة. طه = المعجزات. الشعراء = المواجهة.'},
+
+  {id:'khidr',cat:'musa',name:'موسى والعبد الصالح',surahs:['الكهف (60-82)'],
+   ayah:'﴿آتَيْنَاهُ رَحْمَةً مِّنْ عِندِنَا وَعَلَّمْنَاهُ مِن لَّدُنَّا عِلْمًا﴾',ref:'الكهف: 65',
+   teaser:'ثلاثة أفعال تبدو خطأً — وحكمة وراءها تُبكي',
+   summary:'طلب موسى اتّباع رجل أوتي علماً لدنياً. خرق السفينة فاعترض. قتل الغلام فاعترض. أقام الجدار فاعترض. عند الفراق كشف: كل فعل كان رحمةً مخفية.',
+   stages:[
+     {title:'البحث عن العالِم والشرط',hint:'كيف وجد موسى العبد الصالح وما الشرط؟',chars:['موسى','العبد الصالح'],ayah:'﴿قَالَ إِنَّكَ لَن تَسْتَطِيعَ مَعِيَ صَبْرًا﴾',ayah_ref:'الكهف: 67',detail:'سأل الله موسى: هل تعلم أن أحداً أعلم منك؟ قال: لا. قيل له: بلى. انطلق موسى رحلة طويلة حتى وجد العبد الصالح. اشترط: لن تصبر على ما لا تُحيط به خبراً. وافق موسى.',note:'موسى كليم الله — مع ذلك أُرسل ليتعلم. العلم اللدني أعمق من علم الوحي في بعض الجوانب.'},
+     {title:'خرق السفينة — رحمة مخفية',hint:'لماذا خرق السفينة وما الحكمة؟',chars:['العبد الصالح','موسى'],ayah:'﴿أَمَّا السَّفِينَةُ فَكَانَتْ لِمَسَاكِينَ يَعْمَلُونَ فِي الْبَحْرِ فَأَرَدتُّ أَنْ أَعِيبَهَا﴾',ayah_ref:'الكهف: 79',detail:'خرق سفينة مساكين يعيشون منها. ملك ظالم كان يأخذ كل سفينة صالحة غصباً. الخرق جعلها معيبة فتركها الملك لأصحابها.',note:'أحسن المظاهر قد يكون خيراً مخفياً. الإفساد الظاهر صان ممتلكات الفقراء.'},
+     {title:'قتل الغلام — حماية الوالدين',hint:'لماذا قتل غلاماً بريئاً؟',chars:['العبد الصالح','الغلام','أبواه'],ayah:'﴿أَمَّا الْغُلَامُ فَكَانَ أَبَوَاهُ مُؤْمِنَيْنِ فَخَشِينَا أَن يُرْهِقَهُمَا طُغْيَانًا وَكُفْرًا﴾',ayah_ref:'الكهف: 80',detail:'الغلام كان كافراً سيُلحق الغم والأذى بأبويه المؤمنين. "أراد ربكما أن يُبدّلهما خيراً منه زكاةً وأقرب رُحماً".',note:'ما يبدو مصيبةً كبرى (موت طفل) قد يكون رحمةً لأهله. الله أراد للوالدين المؤمنين طفلاً خيراً.'},
+     {title:'الجدار بلا أجر — كنز اليتيمين',hint:'لماذا أقام الجدار مجاناً لقوم بخلاء؟',chars:['العبد الصالح','اليتيمان'],ayah:'﴿وَأَمَّا الْجِدَارُ فَكَانَ لِغُلَامَيْنِ يَتِيمَيْنِ فِي الْمَدِينَةِ وَكَانَ أَبُوهُمَا صَالِحًا﴾',ayah_ref:'الكهف: 82',detail:'تحت الجدار كنز ليتيمين. أبوهما كان صالحاً. الله أراد حفظ الكنز لهما حين يكبران.',note:'الأب الصالح يحفظ الله ذريته من بعده. الصلاح يمتد أثره لأجيال.'},
+   ],
+   surah_details:[{n:'الكهف (60-82)',d:'23 آية — درس العلم اللدني والصبر'}],
+   lesson:'ما يبدو شراً قد يكون رحمةً مُبطّنة. العلم البشري محدود. الصبر على ما لا نفهمه عبادة.',link:'القصة في الكهف بين قصص الدين والمال والعلم والسلطة.'},
+
+  {id:'talut_dawud',cat:'musa',name:'طالوت وداود وجالوت',surahs:['البقرة (246-251)'],
+   ayah:'﴿كَم مِّن فِئَةٍ قَلِيلَةٍ غَلَبَتْ فِئَةً كَثِيرَةً بِإِذْنِ اللَّهِ﴾',ref:'البقرة: 249',
+   teaser:'جيش قليل ثابت يهزم جيشاً كبيراً — وداود شاب يقتل الجبار',
+   summary:'طلب بنو إسرائيل ملكاً. اختار الله طالوت فاعترضوا لفقره. اختبرهم بالنهر فانكسر أكثرهم. لقي الثابتون جيش جالوت. قتل داود الشاب جالوت الجبار.',
+   stages:[
+     {title:'الطلب والاعتراض على اختيار الله',hint:'لماذا اعترض بنو إسرائيل على طالوت؟',chars:['بنو إسرائيل','النبي','طالوت'],ayah:'﴿قَالُوا أَنَّىٰ يَكُونُ لَهُ الْمُلْكُ عَلَيْنَا وَنَحْنُ أَحَقُّ بِالْمُلْكِ مِنْهُ وَلَمْ يُؤْتَ سَعَةً مِّنَ الْمَالِ﴾',ayah_ref:'البقرة: 247',detail:'طلبوا ملكاً للجهاد. اختار الله طالوت. اعترضوا: "نحن أحقّ منه بالملك ولم يُؤتَ سعةً من المال". ردّ النبي: "الله اصطفاه وزاده بسطةً في العلم والجسم". معيار الله في القيادة مختلف.',note:'الله يختار القائد بالعلم والجسم والكفاءة لا بالثروة. المعيار الإلهي يُربك المعايير البشرية.'},
+     {title:'اختبار النهر وانكشاف الثابتين',hint:'كيف كشف النهر من سيثبت ومن لن يثبت؟',chars:['طالوت','الجيش'],ayah:'﴿فَمَن شَرِبَ مِنْهُ فَلَيْسَ مِنِّي وَمَن لَّمْ يَطْعَمْهُ فَإِنَّهُ مِنِّي إِلَّا مَنِ اغْتَرَفَ غُرْفَةً بِيَدِهِ﴾',ayah_ref:'البقرة: 249',detail:'اختبرهم طالوت بنهر: لا تشربوا. شرب أكثرهم شرباً كثيراً ففارقوه. لم يثبت إلا القليل الذي اكتفى بغرفة. هؤلاء القليل قالوا: "كم من فئة قليلة غلبت فئة كثيرة بإذن الله".',note:'اختبار الطاعة في الصغير كاشف لمن سيُطيع في الكبير. النهر كان فلتراً قبل الحرب.'},
+     {title:'داود الشاب يقتل جالوت',hint:'كيف قتل شاب صغير جبّاراً لم يجرؤ عليه الكبار؟',chars:['داود','جالوت','طالوت'],ayah:'﴿فَهَزَمُوهُم بِإِذْنِ اللَّهِ وَقَتَلَ دَاوُودُ جَالُوتَ وَآتَاهُ اللَّهُ الْمُلْكَ وَالْحِكْمَةَ﴾',ayah_ref:'البقرة: 251',detail:'خرج جالوت الجبار يتحدى. أقبل داود — شاب صغير بين الجيش — ببضع حجارات ومقلاع. رمى فأصاب جالوت في مقتل. انكسر الجيش المعادي. وهب الله داود الملك والحكمة والعلم.',note:'الله يُعطي الملك لمن يشاء — لا بالنسب ولا بالثروة بل بالإيمان والشجاعة. داود كان الأصغر في جيشه.'},
+   ],
+   surah_details:[{n:'البقرة (246-251)',d:'القصة كاملة في 6 آيات'}],
+   lesson:'الله يختار القائد بالكفاءة لا بالثروة. العدد لا يصنع النصر — الإيمان يصنعه.',link:'قصة مُفردة في البقرة في سياق الإنفاق والجهاد — القوة المادية ليست المعيار.'},
+
+  /* ===== داود وسليمان ===== */
+  {id:'dawud',cat:'dawud',name:'داود عليه السلام',surahs:['البقرة','الأنبياء','سبأ','ص'],
+   ayah:'﴿وَشَدَدْنَا مُلْكَهُ وَآتَيْنَاهُ الْحِكْمَةَ وَفَصْلَ الْخِطَابِ﴾',ref:'ص: 20',
+   teaser:'الملك الشاب الذي قتل جالوت — الزبور والحديد والقضاء',
+   summary:'قتل داود جالوت شاباً فوهبه الله الملك. أُعطي الزبور وتسبيح الجبال معه. أُلانت له الحديد. اختُبر بالرجلين في المحراب فاستغفر.',
+   stages:[
+     {title:'الزبور وتسبيح الجبال والطير',hint:'ما الكيفية التي تُسبّح فيها الجبال مع داود؟',chars:['داود','الجبال','الطير'],ayah:'﴿إِنَّا سَخَّرْنَا الْجِبَالَ مَعَهُ يُسَبِّحْنَ بِالْعَشِيِّ وَالْإِشْرَاقِ وَالطَّيْرَ مَحْشُورَةً﴾',ayah_ref:'ص: 18-19',detail:'حين كان داود يترنّم بالزبور مُسبِّحاً الله كانت الجبال تُردّد التسبيح معه مستجيبةً. والطير تتجمّع من كل مكان. الكون يُشارك عبداً أحبّ ربه في التسبيح.',note:'الكون يُسبّح الله دائماً — لكنه يُسبّح مع بعض عباده بشكل مُعلَن. داود كان في ذروة القرب.'},
+     {title:'إلانة الحديد وصنع الدروع',hint:'ما معجزة الحديد ودلالتها؟',chars:['داود'],ayah:'﴿وَأَلَنَّا لَهُ الْحَدِيدَ أَنِ اعْمَلْ سَابِغَاتٍ﴾',ayah_ref:'سبأ: 10-11',detail:'أُلين الحديد بين يدي داود كالعجين يشكّله بيديه دون نار. أُمر بصنع الدروع الواسعة بتقدير دقيق. لم يكن ملكاً يأمر الصنّاع فقط — كان نفسه الصانع.',note:'القرآن يُكرّم داود على عمله اليدوي. الإتقان في التصنيع أمر إلهي. الملك الذي يعمل بيديه نموذج للحضارة.'},
+     {title:'ابتلاء الرجلين في المحراب',hint:'ما الدرس من ابتلاء الرجلين؟',chars:['داود','رجلان'],ayah:'﴿وَظَنَّ دَاوُودُ أَنَّمَا فَتَنَّاهُ فَاسْتَغْفَرَ رَبَّهُ وَخَرَّ رَاكِعًا وَأَنَابَ﴾',ayah_ref:'ص: 24',detail:'تسوّر رجلان محراب داود طالبَيْن الحكم بينهما. حكم داود لأحدهما. أدرك أن الله ابتلاه — ليُعلّمه الاستماع لكلا الطرفين قبل الحكم. فاستغفر فوراً وخرّ ساجداً.',note:'الملك العادل يُحاسَب على دقائق الحكم. الاستغفار الفوري عند الخطأ فضيلة الحكام الصالحين.'},
+   ],
+   surah_details:[{n:'ص (17-25)',d:'الابتلاء والاستغفار والملك'},{n:'سبأ (10-11)',d:'الجبال والطير والحديد'}],
+   lesson:'الملك العادل يُؤيّده الكون. الصانع النبي نموذج للحضارة. الاستغفار الفوري سمة الأنبياء.',link:'سبأ تُركّز على المعجزات. ص على الابتلاء والاستغفار.'},
+
+  {id:'sulayman',cat:'dawud',name:'سليمان عليه السلام',surahs:['النمل','ص','سبأ'],
+   ayah:'﴿رَبِّ اغْفِرْ لِي وَهَبْ لِي مُلْكًا لَّا يَنبَغِي لِأَحَدٍ مِّن بَعْدِي﴾',ref:'ص: 35',
+   teaser:'يفهم النمل ويُطيعه الجن والريح — ومات على عصاه درساً للأبد',
+   summary:'وُهب سليمان ملكاً لا يُكرَّر. يفهم لغة الطير والنمل. الجن والريح تُطيعه. استدعى عرش بلقيس في طرفة عين. اختبره الله بالخيول. مات على عصاه.',
+   stages:[
+     {title:'لغة النمل والاعتراف بصغر الخلق',hint:'ما قصة النملة وما دلالتها؟',chars:['سليمان','النملة'],ayah:'﴿قَالَتْ نَمْلَةٌ يَا أَيُّهَا النَّمْلُ ادْخُلُوا مَسَاكِنَكُمْ لَا يَحْطِمَنَّكُمْ سُلَيْمَانُ وَجُنُودُهُ﴾',ayah_ref:'النمل: 18',detail:'كان جيش سليمان يسير وفيه صفوف من الجن والإنس والطير. حين وصلوا لوادي النمل سمع سليمان نملة تُنبّه رفيقاتها. ضحك سليمان ودعا: "ربّ أوزعني أن أشكر نعمتك".',note:'ملك الكون أُسعده أن نملة صغيرة تُعرّفه بالاسم. الكِبَر الحقيقي يجعلك ترى الصغار ويُفرحك ذلك.'},
+     {title:'بلقيس وعرشها واستسلامها',hint:'كيف كانت رحلة بلقيس من الكبرياء للإسلام؟',chars:['سليمان','الهدهد','بلقيس'],ayah:'﴿قَالَتْ رَبِّ إِنِّي ظَلَمْتُ نَفْسِي وَأَسْلَمْتُ مَعَ سُلَيْمَانَ لِلَّهِ رَبِّ الْعَالَمِينَ﴾',ayah_ref:'النمل: 44',detail:'أبلغها الهدهد برسالة سليمان. أرسلت هدية فردّها. استُحضر عرشها في طرفة عين. دخلت الصرح الممرّد فحسبته ماء. قال سليمان: "إنه صرح ممرّد من قوارير". فهمت وأسلمت.',note:'الملكة الحكيمة تختار العقل على الغرور. الإسلام الطوعي بعد تأمل أعمق من إسلام الخوف.'},
+     {title:'الخيول والابتلاء والتوبة',hint:'كيف كانت الخيول فتنةً لسليمان؟',chars:['سليمان'],ayah:'﴿إِنِّي أَحْبَبْتُ حُبَّ الْخَيْرِ عَن ذِكْرِ رَبِّي حَتَّىٰ تَوَارَتْ بِالْحِجَابِ﴾',ayah_ref:'ص: 32',detail:'عُرضت على سليمان خيول رائعة. راح يتأملها حتى غابت الشمس وفات وقت الصلاة. أدرك ما فعل. قال: "أحببت حب الخير عن ذكر ربي". تاب وأناب.',note:'الخيل "الخير" لكنها شغلته عن الصلاة. كل شيء جميل قد يكون فتنة إن أنسى ذكر الله.'},
+     {title:'الموت على العصا ودرس الجن',hint:'لماذا كان موت سليمان على عصاه درساً كونياً؟',chars:['سليمان','الجن','الأرضة'],ayah:'﴿فَلَمَّا خَرَّ تَبَيَّنَتِ الْجِنُّ أَن لَّوْ كَانُوا يَعْلَمُونَ الْغَيْبَ مَا لَبِثُوا فِي الْعَذَابِ الْمُهِينِ﴾',ayah_ref:'سبأ: 14',detail:'مات سليمان واقفاً متكئاً على عصاه. الجن تظن أنه حيّ وتواصل العمل. أكلت الأرضة العصا فخرّ جسده. عندها عرفت الجن أنه مات. لو كانوا يعلمون الغيب لعلموا من البداية.',note:'ملك الجن والإنس مات دون أن تعلم الجن. الغيب لله وحده. الدودة الصغيرة أُعطيت ما لم يُعطَه الجن كلهم.'},
+   ],
+   surah_details:[{n:'النمل (15-44)',d:'أشمل رواية: الهدهد وبلقيس والعرش'},{n:'ص (30-40)',d:'الخيول والابتلاء'},{n:'سبأ (12-14)',d:'الموت على العصا'}],
+   lesson:'أعظم الملوك عبد لم تُغرّه قوة الجن. "هذا رحمة من ربي" — عزو النعمة لله.',link:'النمل أروع قصصياً. ص الابتلاء. سبأ الموت الحكيم.'},
+
+  /* ===== أنبياء آخرون ===== */
+  {id:'ayyub',cat:'anbiya',name:'أيوب عليه السلام',surahs:['النساء','الأنبياء','ص'],
+   ayah:'﴿وَأَيُّوبَ إِذْ نَادَىٰ رَبَّهُ أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ﴾',ref:'الأنبياء: 83',
+   teaser:'سنوات البلاء وأقصر دعاء في القرآن — وأعظمه أثراً',
+   summary:'ابتُلي أيوب بذهاب ماله وأولاده وصحته سنوات. لم يشكُ بل ذكّر الله برحمته. استجاب الله وأعاد له ضعف ما كان.',
+   stages:[
+     {title:'البلاء الثلاثي: المال والأولاد والصحة',hint:'ما طبيعة البلاء ولماذا كان مركّباً؟',chars:['أيوب'],ayah:'﴿وَاذْكُرْ عَبْدَنَا أَيُّوبَ إِذْ نَادَىٰ رَبَّهُ أَنِّي مَسَّنِيَ الضُّرُّ﴾',ayah_ref:'ص: 41',detail:'ذهب المال ثم الأولاد ثم الصحة. ابتلاء مركّب في آن: لا مال ولا أولاد ولا صحة. كل ما يملكه الإنسان عادةً ذهب معاً. الروايات تُحدّث عن مرض شديد امتد سنوات طويلة.',note:'لا تُقاس المصيبة إلا على ضوء النعمة التي سبقتها. أيوب كان في ذروة النعمة ثم جاء البلاء الكامل.'},
+     {title:'الصبر الطويل دون شكوى على الله',hint:'ما الفرق بين صبر أيوب والصبر العادي؟',chars:['أيوب'],ayah:'﴿إِنَّا وَجَدْنَاهُ صَابِرًا نِّعْمَ الْعَبْدُ إِنَّهُ أَوَّابٌ﴾',ayah_ref:'ص: 44',detail:'أيوب لم يصمت عن الألم. لكنه لم يُلقِ الذنب على الله. الفرق العظيم: لم يقل "لماذا يا رب؟ أنا لا أستحق هذا!". الصبر الحقيقي ليس إنكار الألم بل عدم التشكيك في رحمة الله.',note:'الصبر الحقيقي: اعتراف بالألم مع ثقة بالرحمة. هذان معاً لا أحدهما.'},
+     {title:'الدعاء العظيم في أبسط صياغة',hint:'لماذا كان هذا الدعاء بهذه البساطة معجزاً؟',chars:['أيوب','الله تعالى'],ayah:'﴿أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ﴾',ayah_ref:'الأنبياء: 83',detail:'جملتان فقط. لم يطلب الشفاء صراحةً. لم يُعدّد ما فقده. قال: "مسّني الضر" — الله يعلم. "وأنت أرحم الراحمين" — تذكير بالرحمة لا الشكوى. أرقى مقامات الدعاء.',note:'أقصر دعاء في القرآن وأعمقه. تذكير الله برحمته أعلى من المطالبة بالشفاء — ثقة مطلقة أن الرحيم يعلم.'},
+     {title:'الإجابة الفورية والمضاعفة',hint:'كيف استجاب الله وبماذا أعاد أيوب؟',chars:['أيوب','الله تعالى'],ayah:'﴿فَاسْتَجَبْنَا لَهُ فَكَشَفْنَا مَا بِهِ مِن ضُرٍّ وَآتَيْنَاهُ أَهْلَهُ وَمِثْلَهُم مَّعَهُمْ رَحْمَةً مِّنْ عِندِنَا﴾',ayah_ref:'الأنبياء: 84',detail:'الاستجابة فورية: "فكشفنا". ثم أُعيد له أهله وأُعطي مثلهم زيادةً. "رحمةً من عندنا وذكرى للعابدين" — كل هذا درس للعابدين في كل الأزمان.',note:'الله أعاد أيوب بضعف ما كان. الجزاء من جنس الصبر: صبر مضاعف فجاء العطاء مضاعفاً.'},
+   ],
+   surah_details:[{n:'الأنبياء (83-84)',d:'الدعاء المختصر والإجابة الفورية'},{n:'ص (41-44)',d:'تفصيل البلاء وطريقة الشفاء'}],
+   lesson:'الشكوى إلى الله ليست ضعفاً. "أنت أرحم الراحمين" — التذكير برحمة الله أعمق من المطالبة.',link:'الأنبياء أوجزت. ص فصّلت. معاً يُكملان الصورة.'},
+
+  {id:'yunus',cat:'anbiya',name:'يونس عليه السلام',surahs:['يونس','الأنبياء','الصافات','القلم'],
+   ayah:'﴿فَنَادَىٰ فِي الظُّلُمَاتِ أَن لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ﴾',ref:'الأنبياء: 87',
+   teaser:'النبي الذي غادر بلا إذن — ودعاء الظلمات الثلاث',
+   summary:'يونس غادر قومه غاضباً دون إذن الله. ألقته القرعة في البحر. التقمه الحوت. في ظلمات ثلاث نادى بدعاء التوبة. نجا وأُعيد لقومه الذين آمنوا كاملاً.',
+   stages:[
+     {title:'المغادرة غاضباً دون إذن',hint:'لماذا كانت المغادرة خطأً حتى لو كانت لأسباب مفهومة؟',chars:['يونس','قومه'],ayah:'﴿وَذَا النُّونِ إِذ ذَّهَبَ مُغَاضِبًا فَظَنَّ أَن لَّن نَّقْدِرَ عَلَيْهِ﴾',ayah_ref:'الأنبياء: 87',detail:'يونس دعا قومه وضاق بتكذيبهم. غادر غاضباً دون أن ينتظر إذن الله. ظنّ أن الله لن يُضيّق عليه. لكن المغادرة قبل الإذن الإلهي كانت الخطأ.',note:'حتى الأنبياء يحتاجون إذن الله في القرارات الكبرى. اليأس المبكر من القوم خطأ قبل انتهاء الإذن.'},
+     {title:'القرعة والإلقاء في البحر',hint:'كيف دلّت القرعة ثلاث مرات على أن الله يعيده لنفسه؟',chars:['يونس','ركّاب السفينة'],ayah:'﴿فَسَاهَمَ فَكَانَ مِنَ الْمُدْحَضِينَ﴾',ayah_ref:'الصافات: 141',detail:'ركب السفينة. أجروا قرعة ليُلقوا أحدهم — وقعت على يونس مرة ومرة ومرة. لم يكن الله ليتركه. ألقوه في البحر.',note:'القرعة ثلاث مرات لتُثبت: الله يعيده لنفسه. لو كان في طريق صواب لما وقعت القرعة عليه.'},
+     {title:'دعاء الظلمات الثلاث',hint:'ما سر هذا الدعاء وقوته؟',chars:['يونس','الله تعالى'],ayah:'﴿أَن لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ﴾',ayah_ref:'الأنبياء: 87',detail:'ظلمات ثلاث: بطن الحوت + قاع البحر + الليل. ثلاثة عناصر في دعاء واحد: "لا إله إلا أنت" = توحيد. "سبحانك" = تنزيه الله عن الخطأ. "إني كنت من الظالمين" = اعتراف شجاع.',note:'الاعتراف بالظلم على النفس لا إلقاؤه على الآخرين — هذا مفتاح الباب الإلهي.'},
+     {title:'النجاة والإرسال من جديد',hint:'كيف نجا يونس وما الذي تغيّر؟',chars:['يونس','الله تعالى'],ayah:'﴿فَنَبَذْنَاهُ بِالْعَرَاءِ وَهُوَ سَقِيمٌ وَأَنبَتْنَا عَلَيْهِ شَجَرَةً مِّن يَقْطِينٍ﴾',ayah_ref:'الصافات: 145-146',detail:'أمر الله الحوت بقذفه. خرج مريضاً ضعيفاً. أنبت الله له شجرة يقطين تُظلّله وتُعافيه. أُرسل من جديد لمئة ألف أو يزيدون — وهذه المرة آمنوا بأسرهم.',note:'خرج من بطن الحوت طفلاً جديداً. العودة للرسالة من موضع الضعف لا القوة هي البداية الحقيقية.'},
+   ],
+   surah_details:[{n:'الصافات (139-148)',d:'القصة الأشمل'},{n:'الأنبياء (87-88)',d:'دعاء الظلمات'},{n:'يونس (98)',d:'إيمان القوم الاستثنائي'}],
+   lesson:'حتى الأنبياء يحتاجون إذن الله. الاعتراف بالخطأ مفتاح الخروج من الضيق.',link:'الصافات تحكي القصة. الأنبياء تُركّز على لحظة الدعاء. يونس على إيمان القوم.'},
+
+  {id:'zakariya_yahya',cat:'anbiya',name:'زكريا ويحيى عليهما السلام',surahs:['آل عمران','مريم','الأنبياء'],
+   ayah:'﴿يَا زَكَرِيَّا إِنَّا نُبَشِّرُكَ بِغُلَامٍ اسْمُهُ يَحْيَىٰ لَمْ نَجْعَل لَّهُ مِن قَبْلُ سَمِيًّا﴾',ref:'مريم: 7',
+   teaser:'شيخ عجوز وزوجة عاقر يُبشَّران بنبي — واسمه فريد لم يُسبق',
+   summary:'زكريا كان يكفل مريم ويرى عندها رزقاً غيبياً. دعا ربه سراً. بُشِّر بيحيى رغم شيخوخته. وُلد يحيى وأخذ الكتاب بقوة.',
+   stages:[
+     {title:'زكريا كافل مريم والرزق الغيبي',hint:'كيف أشعل رؤية رزق مريم الغيبي دعاء زكريا؟',chars:['زكريا','مريم'],ayah:'﴿كُلَّمَا دَخَلَ عَلَيْهَا زَكَرِيَّا الْمِحْرَابَ وَجَدَ عِندَهَا رِزْقًا قَالَ يَا مَرْيَمُ أَنَّىٰ لَكِ هَٰذَا قَالَتْ هُوَ مِنْ عِندِ اللَّهِ﴾',ayah_ref:'آل عمران: 37',detail:'كان زكريا يكفل مريم في المحراب. كل مرة يدخل عليها يجد عندها رزقاً من الجنة لا يعلم مصدره. حين سألها قالت: "هو من عند الله يرزق من يشاء بغير حساب". هنا أشتعل قلب زكريا: إذا كان الله يُعطي مريم رزقاً من عنده فلماذا لا يُعطيني ذرية بلا أسباب؟',note:'المشهد الإيماني يُولّد الدعاء. رزق مريم الغيبي ألهم زكريا الدعاء لأن الله قادر على ما يتجاوز الأسباب.'},
+     {title:'الدعاء السري وطلب الذرية',hint:'لماذا كان الدعاء سرياً وما دلالة ذلك؟',chars:['زكريا'],ayah:'﴿إِذْ نَادَىٰ رَبَّهُ نِدَاءً خَفِيًّا قَالَ رَبِّ إِنِّي وَهَنَ الْعَظْمُ مِنِّي وَاشْتَعَلَ الرَّأْسُ شَيْبًا﴾',ayah_ref:'مريم: 3-4',detail:'نادى ربه "نداءً خفياً" — سراً بينه وبين الله. اعترف بضعفه: "وهن العظم مني واشتعل الرأس شيباً". ثم قال طلبه: "ولم أكن بدعائك ربّ شقياً". اعتراف بالضعف + توكيد على أنه لم يُخيَّب من قبل.',note:'الدعاء السري الخالص أبلغ وأوقع. وصف حاله أولاً ليُقرّر أن الأسباب البشرية قد انعدمت — فالعطاء من الله وحده.'},
+     {title:'البشارة بيحيى والتعجب والآية',hint:'كيف كانت البشارة وما الآية التي طلبها؟',chars:['زكريا','الملائكة'],ayah:'﴿قَالَ رَبِّ أَنَّىٰ يَكُونُ لِي غُلَامٌ وَكَانَتِ امْرَأَتِي عَاقِرًا وَقَدْ بَلَغْتُ مِنَ الْكِبَرِ عِتِيًّا﴾',ayah_ref:'مريم: 8',detail:'قالت الملائكة: "يا زكريا إنا نُبشّرك بغلام اسمه يحيى لم نجعل له من قبل سمياً". قال زكريا مندهشاً: "أنّى يكون لي غلام وزوجتي عاقر وأنا بلغت الكِبَر عِتياً؟". قيل: "كذلك قال ربك هو عليّ هيّن". طلب آيةً. الآية: لن تُكلّم الناس ثلاثة أيام إلا رمزاً.',note:'"هو عليّ هيّن" — ما يبدو مستحيلاً عند الإنسان هيّن عند الله. التعجب ليس شكاً بل استفهاماً عن الكيفية.'},
+     {title:'يحيى يأخذ الكتاب بقوة',hint:'ما معنى أخذ الكتاب بقوة؟',chars:['يحيى'],ayah:'﴿يَا يَحْيَىٰ خُذِ الْكِتَابَ بِقُوَّةٍ وَآتَيْنَاهُ الْحُكْمَ صَبِيًّا﴾',ayah_ref:'مريم: 12',detail:'أعطى الله يحيى الكتاب وأمره بأخذه "بقوة" — بجدية وإخلاص تام لا هوادة فيه. وأُعطي الحكم وهو صبي. معنى "أخذ الكتاب بقوة": لا تتعامل مع الدين بفتور أو استهانة.',note:'"خذ الكتاب بقوة" — الاستخفاف بالدين ضعف ومهانة. الجدية في الدين صفة الأنبياء منذ الصغر.'},
+   ],
+   surah_details:[{n:'مريم (2-15)',d:'أشمل رواية: الدعاء والبشارة ومولد يحيى'},{n:'آل عمران (38-41)',d:'الدعاء في المحراب'}],
+   lesson:'الدعاء السري أوقع. المستحيل بشرياً ليس مستحيلاً أمام الله. "خذ الكتاب بقوة" — الجدية في الدين فضيلة.',link:'مريم تُفصّل بشكل أكمل. آل عمران تُركّز على الدعاء في المحراب.'},
+
+  {id:'isa_mariam',cat:'anbiya',name:'عيسى ومريم عليهما السلام',surahs:['آل عمران','مريم','المائدة','الصف'],
+   ayah:'﴿إِنَّ مَثَلَ عِيسَىٰ عِندَ اللَّهِ كَمَثَلِ آدَمَ خَلَقَهُ مِن تُرَابٍ ثُمَّ قَالَ لَهُ كُن فَيَكُونُ﴾',ref:'آل عمران: 59',
+   teaser:'كلمة الله وروح منه — الميلاد المعجز والمائدة من السماء والرفع',
+   summary:'مريم نُذرت لله قبل ولادتها. بُشّرت بعيسى فولدته وحيدة. تكلّم عيسى في المهد. أُعطي المعجزات الكبرى. رُفع ولم يُصلب.',
+   stages:[
+     {title:'نذر أم مريم وتكريمها في المحراب',hint:'كيف بدأت قصة مريم قبل ولادتها؟',chars:['أم مريم','مريم الصغيرة','زكريا'],ayah:'﴿إِذْ قَالَتِ امْرَأَتُ عِمْرَانَ رَبِّ إِنِّي نَذَرْتُ لَكَ مَا فِي بَطْنِي مُحَرَّرًا﴾',ayah_ref:'آل عمران: 35',detail:'نذرت أم مريم ما في بطنها لله قبل ولادته. كانت تتوقع ذكراً للخدمة في المعبد. حين وُلدت أنثى قالت: "وليست الذكر كالأنثى". لكن الله قبل البنت بالأفضل. كفلها زكريا وكان يجد عندها رزقاً غيبياً.',note:'الله أعطاها أفضل مما طُلب. النذر الصادق لله يُؤيّده الله حتى حين تُفاجأ بغير المتوقع.'},
+     {title:'البشارة بعيسى والتسليم الكامل',hint:'كيف استقبلت مريم البشارة المستحيلة؟',chars:['مريم','جبريل'],ayah:'﴿قَالَتْ رَبِّ أَنَّىٰ يَكُونُ لِي وَلَدٌ وَلَمْ يَمْسَسْنِي بَشَرٌ﴾',ayah_ref:'آل عمران: 47',detail:'جاء جبريل في صورة بشر. قالت: "إني أعوذ بالرحمن منك". بشّرها بعيسى. تعجّبت: "كيف يكون لي ولد ولم يمسسني بشر؟". قيل: "كذلك الله يخلق ما يشاء — إذا قضى أمراً فإنما يقول له كن فيكون".',note:'"أعوذ بالرحمن منك" — ردّ فعل المؤمن الأول عند الفجأة هو الاستعاذة بالله. مريم آمنت فوراً بعد الكشف.'},
+     {title:'الولادة وحيدة والعودة بالمولود',hint:'ما الذي حدث في لحظة الولادة وكيف دافع عيسى عن أمه؟',chars:['مريم','عيسى المولود','قومها'],ayah:'﴿فَأَشَارَتْ إِلَيْهِ قَالُوا كَيْفَ نُكَلِّمُ مَن كَانَ فِي الْمَهْدِ صَبِيًّا﴾',ayah_ref:'مريم: 29',detail:'ولدت مريم وحيدة تحت النخلة. جاءت بالمولود لقومها فاتهموها. أشارت إليه. قالوا: كيف نكلّم طفلاً؟ فتكلّم عيسى في المهد: "إني عبد الله آتاني الكتاب وجعلني نبياً". دفاع كوني عن أمه.',note:'الله دافع عن مريم بأبلغ دفاع — بكلام ابنها المولود. حين يترك المؤمن أمره لله يُدافع الله عنه بما لم يخطر ببال.'},
+     {title:'معجزات عيسى الكبرى',hint:'ما المعجزات التي أُعطيها عيسى ولماذا كانت بهذه الخصوصية؟',chars:['عيسى','المرضى','الموتى'],ayah:'﴿وَأُبْرِئُ الْأَكْمَهَ وَالْأَبْرَصَ وَأُحْيِي الْمَوْتَىٰ بِإِذْنِ اللَّهِ﴾',ayah_ref:'آل عمران: 49',detail:'أُعطي عيسى معجزات في قلب تخصّص اليهود (الطب): إبراء الأعمى الذي وُلد كذلك، إبراء الأبرص، إحياء الموتى. وصنع طيراً من طين ونفخ فيه فطار. كل معجزة في مجال يثق فيه قومه.',note:'"بإذن الله" — عيسى لا يُحيي بقدرته الذاتية. كل معجزة بإذن الله. هذا درس في التوحيد مُضمَّن في كل معجزة.'},
+     {title:'رفع عيسى ولم يُصلب',hint:'ما الموقف القرآني من صلب عيسى؟',chars:['عيسى','اليهود','الله تعالى'],ayah:'﴿وَمَا قَتَلُوهُ وَمَا صَلَبُوهُ وَلَٰكِن شُبِّهَ لَهُمْ وَإِنَّ الَّذِينَ اخْتَلَفُوا فِيهِ لَفِي شَكٍّ مِّنْهُ﴾',ayah_ref:'النساء: 157',detail:'القرآن صريح: عيسى لم يُقتَل ولم يُصلَب. شُبِّه لهم (ظنّوا أنهم قتلوه). "بل رفعه الله إليه". عيسى مرفوع حي إلى الله. وسيعود في آخر الزمان.',note:'هذا الموقف القرآني جوهر الفارق بين الإسلام والمسيحية. عيسى عبد الله ورسوله لا يُصلَب — بل يُكرَّم.'},
+   ],
+   surah_details:[{n:'آل عمران (45-59)',d:'البشارة ومثل عيسى'},{n:'مريم (16-34)',d:'الميلاد المعجز'},{n:'المائدة (110-115)',d:'المعجزات واللقاء يوم القيامة'}],
+   lesson:'عيسى عبد الله ورسوله. المعجزات بإذن الله لا بقدرة ذاتية. التسليم لله وحده دين كل الأنبياء.',link:'آل عمران أشمل إلهياً. مريم أجمل إنسانياً. المائدة أقوى دلالةً على رسالته.'},
+
+  /* ===== قصص أخرى ===== */
+  {id:'kahf',cat:'others',name:'أصحاب الكهف',surahs:['الكهف (9-26)'],
+   ayah:'﴿رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا﴾',ref:'الكهف: 10',
+   teaser:'فتية مؤمنون نوّمهم الله 309 سنوات حفاظاً على دينهم',
+   summary:'فتية مؤمنون في مجتمع وثني رفضوا الشرك وفرّوا للكهف. نام الله أعينهم 309 سنوات. استيقظوا يظنونها ساعات. أثّروا في الأجيال.',
+   stages:[
+     {title:'الفتية المؤمنون ومواجهة المجتمع',hint:'من هم وكيف كانت جرأتهم في مجتمعهم؟',chars:['الفتية'],ayah:'﴿إِنَّهُمْ فِتْيَةٌ آمَنُوا بِرَبِّهِمْ وَزِدْنَاهُمْ هُدًى﴾',ayah_ref:'الكهف: 13',detail:'كانوا شباباً في مجتمع يعبد الأصنام تحت حكم ملك جبّار. لم يصمتوا بل جاهروا: "ربنا رب السماوات والأرض لن ندعو من دونه إلهاً". لم يكن لديهم سلطة ولا جيش — فقط إيمان.',note:'"فتية" — شباب. القرآن أعطى هذه القصة لشباب كل الأزمان: الإيمان في وجه المجتمع ممكن ومُكرَّم.'},
+     {title:'قرار الفرار ودعاء الكهف',hint:'ما دلالة الدعاء قبل الفرار؟',chars:['الفتية'],ayah:'﴿رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا﴾',ayah_ref:'الكهف: 10',detail:'"آتنا من لدنك رحمة" = رحمة من عندك أنت لا من عند بشر. "وهيّئ لنا من أمرنا رشداً" = وفّق قراراتنا للصواب. لم يطلبوا نجاةً محددة — طلبوا من الله رحمة وتوفيقاً وتركوا التفاصيل له.',note:'أعظم دعاء في المأزق: لا تطلب الحل المحدد — اطلب رحمة الله وتوفيقه. هو أعلم بما يصلحك.'},
+     {title:'النوم 309 سنوات وحفظ الأجساد',hint:'كيف حفظ الله أجسادهم طوال هذه المدة؟',chars:['الفتية','الله تعالى'],ayah:'﴿وَنُقَلِّبُهُمْ ذَاتَ الْيَمِينِ وَذَاتَ الشِّمَالِ وَكَلْبُهُم بَاسِطٌ ذِرَاعَيْهِ بِالْوَصِيدِ﴾',ayah_ref:'الكهف: 18',detail:'الله أنام أعينهم "ضربنا على آذانهم". وكان يُقلّبهم يميناً وشمالاً لتتجدد الدورة الدموية في أجسادهم ولا تُصاب بالضمور. حفظ الله أجسادهم معجزياً كل هذه السنين.',note:'الله حفظ أجسادهم بتدبير دقيق — التقليب ليس عشوائياً. حتى في النوم الطويل الله يرعى.'},
+     {title:'الاستيقاظ والكشف والأثر في الأجيال',hint:'ما الدرس الكبير الذي أراد الله من قصتهم؟',chars:['الفتية','أهل المدينة'],ayah:'﴿وَكَذَٰلِكَ أَعْثَرْنَا عَلَيْهِمْ لِيَعْلَمُوا أَنَّ وَعْدَ اللَّهِ حَقٌّ وَأَنَّ السَّاعَةَ لَا رَيْبَ فِيهَا﴾',ayah_ref:'الكهف: 21',detail:'أراد الله من هذا الحدث برهاناً حياً على البعث. قوم تجادلوا في أمر البعث فأعثرهم الله على الفتية دليلاً. هذا تصوير لما يحدث يوم القيامة — ينامون طويلاً ثم يستيقظون وكأنهم لم يناموا.',note:'الله استخدم قصة الكهف حجةً في النقاش على البعث. المعجزة ليست للترفيه — بل لإثبات الحق.'},
+   ],
+   surah_details:[{n:'الكهف (9-26)',d:'القصة كاملة في 18 آية ضمن سياق الأربع قصص'}],
+   lesson:'الهجرة بالدين خير من البقاء مع الفتنة. "ربنا هيّئ لنا من أمرنا رشدا".',link:'سورة الكهف ضمّت 4 قصص موازية: الكهف=الدين، الجنتان=المال، موسى=العلم، ذو القرنين=السلطة.'},
+
+  {id:'dhul_qarnayn',cat:'others',name:'ذو القرنين',surahs:['الكهف (83-98)'],
+   ayah:'﴿إِنَّا مَكَّنَّا لَهُ فِي الْأَرْضِ وَآتَيْنَاهُ مِن كُلِّ شَيْءٍ سَبَبًا﴾',ref:'الكهف: 84',
+   teaser:'ملك مُمكَّن يسير ثلاث رحلات ويبني السد الكبير',
+   summary:'ملك مُمكَّن آتاه الله من كل شيء سبباً. ثلاث رحلات: الغرب — الشرق — الشمال. في الشمال بنى السد من الحديد والنحاس لحماية قوم ضعفاء من يأجوج ومأجوج.',
+   stages:[
+     {title:'التمكين وإعطاء الأسباب',hint:'ما معنى "آتيناه من كل شيء سبباً"؟',chars:['ذو القرنين','الله تعالى'],ayah:'﴿وَآتَيْنَاهُ مِن كُلِّ شَيْءٍ سَبَبًا فَأَتْبَعَ سَبَبًا﴾',ayah_ref:'الكهف: 84-85',detail:'أعطاه الله الوسائل اللازمة لتحقيق أهدافه — المعرفة والقوة والجيش والموارد. "فأتبع سبباً" — استخدم كل سبب أُعطيه فعلاً. الإعطاء الإلهي لا يكفي — يجب استخدامه.',note:'التمكين من الله + الاستخدام من العبد. من أُعطي الأسباب ولم يستخدمها فرّط في الأمانة.'},
+     {title:'رحلة الغرب والعدل في الحكم',hint:'كيف كان أسلوبه في الحكم؟',chars:['ذو القرنين','قوم الغرب'],ayah:'﴿قَالَ أَمَّا مَن ظَلَمَ فَسَوْفَ نُعَذِّبُهُ ثُمَّ يُرَدُّ إِلَىٰ رَبِّهِ فَيُعَذِّبُهُ عَذَابًا نُّكْرًا وَأَمَّا مَنْ آمَنَ وَعَمِلَ صَالِحًا فَلَهُ جَزَاءً الْحُسْنَىٰ﴾',ayah_ref:'الكهف: 87-88',detail:'حين وصل لقوم الغرب وضع قاعدة حكمه صريحة: الظالم يُعاقَب دنيوياً وأُخروياً. المؤمن الصالح له الجزاء الحسن. عدالة واضحة لا ضبابية.',note:'الحاكم العادل يُعلن معايير الحكم للجميع مسبقاً. لا مجال للتحيز حين يكون الحكم معلناً.'},
+     {title:'السد من الحديد والنحاس',hint:'كيف بنى السد وما الفلسفة وراءه؟',chars:['ذو القرنين','القوم الضعفاء'],ayah:'﴿آتُونِي زُبَرَ الْحَدِيدِ حَتَّىٰ إِذَا سَاوَىٰ بَيْنَ الصَّدَفَيْنِ قَالَ انفُخُوا حَتَّىٰ إِذَا جَعَلَهُ نَارًا قَالَ آتُونِي أُفْرِغْ عَلَيْهِ قِطْرًا﴾',ayah_ref:'الكهف: 96',detail:'طلب قوم ضعفاء حمايتهم من يأجوج ومأجوج وعرضوا المال. رفض المال: "ما مكّني فيه ربي خير". طلب العمل منهم معاً — جمع الحديد ونفخ النار وأفرغ النحاس المذاب فوقه.',note:'رفض المال مقابل خدمة المظلومين — الحاكم العادل لا يبيع الحماية بل يُعطيها حقاً. "ما مكّني فيه ربي خير".'},
+     {title:'الحكمة الختامية: السد إلى أجل',hint:'لماذا قال ذو القرنين "هذا رحمة من ربي"؟',chars:['ذو القرنين'],ayah:'﴿قَالَ هَٰذَا رَحْمَةٌ مِّن رَّبِّي فَإِذَا جَاءَ وَعْدُ رَبِّي جَعَلَهُ دَكَّاءَ﴾',ayah_ref:'الكهف: 98',detail:'بعد بناء السد الضخم لم يقل "أنا بنيته". قال: "هذا رحمة من ربي". وأقرّ أن السد مؤقت: "فإذا جاء وعد ربي جعله دكاء". القوة البشرية كلها مؤقتة.',note:'"هذا رحمة من ربي" — عزو النعمة لله لا للنفس فور انتهاء العمل. الاعتراف الفوري بالفضل الإلهي فضيلة الملوك الصالحين.'},
+   ],
+   surah_details:[{n:'الكهف (83-98)',d:'ثلاث رحلات والسد — القصة الكاملة'}],
+   lesson:'السلطة من الله للخدمة لا للاستعباد. كل قدرة مسؤولية. "هذا رحمة من ربي".',link:'ختمت الأربع قصص في الكهف: الكهف=الدين، الجنتان=المال، موسى=العلم، ذو القرنين=السلطة.'},
+
+  {id:'ukhdud',cat:'others',name:'أصحاب الأخدود',surahs:['البروج (4-10)'],
+   ayah:'﴿قُتِلَ أَصْحَابُ الْأُخْدُودِ النَّارِ ذَاتِ الْوَقُودِ﴾',ref:'البروج: 4–5',
+   teaser:'أُحرقوا حياً بسبب الإيمان فقط — ولم تنزل معجزة للإنقاذ',
+   summary:'ملك أمر بحفر خنادق وإشعال نيران. أُلقي المؤمنون فيها. جريمتهم الوحيدة: الإيمان بالله. لم تنزل معجزة. وعد الله الشهداء بالجنة.',
+   stages:[
+     {title:'الملك والخنادق والنيران',hint:'ما السياق الذي حدثت فيه هذه الجريمة؟',chars:['الملك الجبّار'],ayah:'﴿قُتِلَ أَصْحَابُ الْأُخْدُودِ النَّارِ ذَاتِ الْوَقُودِ إِذْ هُمْ عَلَيْهَا قُعُودٌ﴾',ayah_ref:'البروج: 4-6',detail:'حفر الملك خنادق عميقة وأشعل فيها نيراناً عظيمة. الهدف: إما الردة عن الدين أو الحرق. جلس الجلادون على حواف الخنادق يشاهدون مُتلذّذين.',note:'الطغيان في أبشع صوره: لا يكفيه منع الدين بل يريد إبادة المؤمنين أمام بعضهم عقاباً إضافياً.'},
+     {title:'إلقاء المؤمنين وجريمتهم الوحيدة',hint:'ما الذي جعل هذه القصة استثنائية في القرآن؟',chars:['المؤمنون','الجلادون'],ayah:'﴿وَمَا نَقَمُوا مِنْهُمْ إِلَّا أَن يُؤْمِنُوا بِاللَّهِ الْعَزِيزِ الْحَمِيدِ﴾',ayah_ref:'البروج: 8',detail:'القرآن نصّ على سبب القتل صراحةً: "وما نقموا منهم إلا أن يؤمنوا بالله". لا جريمة سياسية ولا جنائية — فقط الإيمان. إشهاد كوني على عدالة الله وظلم الجبّارين.',note:'حين يُذكر سبب الجريمة صراحةً في القرآن فهو توثيق كوني. الله يشهد على ظلم كل طاغية.'},
+     {title:'لم تنزل معجزة والشهادة الجائزة',hint:'لماذا لم ينقذهم الله كما أنقذ إبراهيم؟',chars:['المؤمنون الشهداء'],ayah:'﴿إِنَّ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ لَهُمْ جَنَّاتٌ تَجْرِي مِن تَحْتِهَا الْأَنْهَارُ﴾',ayah_ref:'البروج: 11',detail:'إبراهيم نجا من النار معجزةً. هؤلاء لم ينجوا. لأن الله أحياناً يُكرم عبده بالشهادة لا بالإنقاذ. مكانتهم عنده أعلى من أن يُنقذهم لحياة دنيوية أطول.',note:'الإنقاذ ليس دائماً الجائزة الكبرى. الشهادة أعلى مقاماً. الله لم يتخلّ عنهم — بل اختارهم لأرقى الجوائز.'},
+   ],
+   surah_details:[{n:'البروج (4-10)',d:'أقسى قصة — الإحراق بسبب الإيمان فقط'}],
+   lesson:'أحياناً الله لا يُنقذ من الموت بل يُنقذ من خلاله. الثبات حتى الموت أعلى مقامات الإيمان.',link:'سورة البروج وضعت هذه القصة بعد آيات السماء لتقول: الله يعلم كل ظلمة وسيُحاسب.'},
+
+  {id:'feel',cat:'others',name:'أصحاب الفيل',surahs:['الفيل (كاملة)'],
+   ayah:'﴿أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ﴾',ref:'الفيل: 1',
+   teaser:'جيش الفيلة يريد هدم الكعبة — وطيور أبابيل تُحسم المعركة',
+   summary:'أبرهة الحبشي جاء بجيش ضخم ومعه الفيلة لهدم الكعبة. وقف الفيل ولم يتحرك نحوها. أرسل الله طيور أبابيل بحجارة من سجيل فجعلتهم كعصف مأكول.',
+   stages:[
+     {title:'أبرهة وهدفه من الكعبة',hint:'لماذا أراد أبرهة هدم الكعبة وما الدافع الحقيقي؟',chars:['أبرهة','جيشه'],ayah:'﴿أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ﴾',ayah_ref:'الفيل: 2',detail:'أبرهة حاكم اليمن للحبشة بنى كنيسة ضخمة "القُلَّيس" وأراد صرف العرب إليها عوضاً عن الكعبة. لما أصرّ الناس على الكعبة سار بجيشه الضخم ومعه فيلة ضخمة لهدمها.',note:'الحسد الديني قد يُحرّك الجيوش. أبرهة لم يكن يُحارب إلهاً — كان يُحارب منافساً دينياً لا يُطيق وجوده.'},
+     {title:'وقوف الفيل ورفض التقدم',hint:'ما دلالة وقوف الفيل ؟',chars:['الجيش','الفيلة'],ayah:'﴿تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ﴾',ayah_ref:'الفيل: 4',detail:'كان للجيش فيل عظيم يُقود الهجوم. حين توجّه نحو مكة وقف ورفض التقدم — يجلس حين يتوجّهون لمكة ويقوم حين يتوجّهون بعيداً. الحيوان رفض ما أبى قلبه المؤمن.',note:'الفيل رفض ما أبى عقله. الله يُهيّئ حتى الحيوانات لحماية بيته. الطبيعة تُطيع أمر الله.'},
+     {title:'طيور أبابيل والحجارة من سجيل',hint:'ما طبيعة هذه الطيور والحجارة؟',chars:['أبرهة وجيشه','طيور أبابيل'],ayah:'﴿فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ﴾',ayah_ref:'الفيل: 5',detail:'أرسل الله طيور أبابيل — أسراباً من الطير — كل طير يحمل ثلاثة أحجار: واحدة في المنقار واثنتان في الرِجلين. الحجارة من سجيل (طين مُحرق). تُرمى فتُصيب. هلك الجيش الضخم على يد طيور صغيرة.',note:'أكبر جيش في المنطقة هُزم بطيور صغيرة. لا قوة تقف أمام قدرة الله حين يُريد الدفاع عن بيته.'},
+   ],
+   surah_details:[{n:'الفيل (كاملة)',d:'القصة في 5 آيات فقط — إيجاز مذهل'}],
+   lesson:'الله يحمي بيته بطيور لا بجيوش. القوة العسكرية الضخمة لا تعني شيئاً أمام قدرة الله.',link:'سورة قصيرة جداً — 5 آيات — لكنها محور: حفظ البيت الحرام وبشارة مولد النبي ﷺ في نفس العام.'},
+
+  {id:'mumin',cat:'others',name:'الرجل المؤمن من آل فرعون',surahs:['غافر (28-45)'],
+   ayah:'﴿وَقَالَ رَجُلٌ مُّؤْمِنٌ مِّنْ آلِ فِرْعَوْنَ يَكْتُمُ إِيمَانَهُ أَتَقْتُلُونَ رَجُلًا أَن يَقُولَ رَبِّيَ اللَّهُ﴾',ref:'غافر: 28',
+   teaser:'مؤمن يكتم إيمانه في قصر فرعون — ويجاهر حين تجاوز الطغيان الخط',
+   summary:'رجل من آل فرعون كان يكتم إيمانه. لما أراد فرعون قتل موسى وقف يُدافع بالحجة والمنطق. قدّم أدلة عقلية قوية. نجاه الله من شرّهم.',
+   stages:[
+     {title:'الإيمان المكتوم في قصر فرعون',hint:'لماذا كان يكتم إيمانه؟',chars:['الرجل المؤمن'],ayah:'﴿وَقَالَ رَجُلٌ مُّؤْمِنٌ مِّنْ آلِ فِرْعَوْنَ يَكْتُمُ إِيمَانَهُ﴾',ayah_ref:'غافر: 28',detail:'كان مؤمناً في بيت أعدى أعداء الإيمان. كتم إيمانه حكمةً لا جُبناً — أراد أن يكون له تأثير من الداخل في اللحظة المناسبة. الكتمان لم يكن خيانةً للإيمان بل حفاظاً على القدرة على التأثير.',note:'المؤمن في بيئة الطغيان يكتم إيمانه حكمةً لا جُبناً. الشجاعة لها أوقاتها ومواضعها.'},
+     {title:'المجاهرة حين تجاوز الطغيان الخط',hint:'ما الخط الذي تجاوزه فرعون فجاهر الرجل؟',chars:['الرجل المؤمن','فرعون'],ayah:'﴿أَتَقْتُلُونَ رَجُلًا أَن يَقُولَ رَبِّيَ اللَّهُ وَقَدْ جَاءَكُم بِالْبَيِّنَاتِ مِن رَّبِّكُمْ﴾',ayah_ref:'غافر: 28',detail:'لما أراد فرعون قتل موسى — لا لجريمة بل لمجرد قوله "ربي الله" — كان هذا الخط الذي لا يُتجاوز صامتاً. قام الرجل يتكلم أمام الجميع: "أتقتلون رجلاً أن يقول ربي الله؟".',note:'حين يتجاوز الطغيان الخطوط الحمراء يجاهر المؤمن. الصمت على قتل بريء شريك في الجريمة.'},
+     {title:'الحجج العقلية وتذكير القوم',hint:'كيف دافع الرجل بالمنطق لا بالسيف؟',chars:['الرجل المؤمن','الحاشية'],ayah:'﴿يَا قَوْمِ اتَّبِعُونِ أَهْدِكُمْ سَبِيلَ الرَّشَادِ﴾',ayah_ref:'غافر: 38',detail:'قدّم سلسلة حجج عقلية: "أتقتلون رجلاً لقوله؟ — هل فعل شيئاً يستحق القتل؟". ثم ذكّر بالماضي: "أين عاد وثمود والأمم من قبل؟". ثم نصح: "يا قوم اتبعوني أهدكم سبيل الرشاد".',note:'سلاح المؤمن في قصر الطغيان العقل والحجة. لم يكن عنده جيش ولا سلطة — فقط المنطق.'},
+     {title:'نجاته من شرّهم بحفظ الله',hint:'كيف نجاه الله وما الدرس؟',chars:['الرجل المؤمن','الله تعالى'],ayah:'﴿فَوَقَاهُ اللَّهُ سَيِّئَاتِ مَا مَكَرُوا﴾',ayah_ref:'غافر: 45',detail:'دبّر فرعون وحاشيته مكراً ضد هذا الرجل بعد جهره. لكن الله وقاه شرّهم. نجا من مكرهم بحفظ إلهي مباشر.',note:'المؤمن الجاهر بالحق في وجه الطغيان يتعرض للأذى — لكن الله يحفظ من يقول الحق لوجهه.'},
+   ],
+   surah_details:[{n:'غافر (28-45)',d:'دفاعه عن موسى وحجته أمام فرعون'}],
+   lesson:'الكتمان حكمة لا جُبن. الجهر بالحق في اللحظة المناسبة شجاعة. العقل والحجة سلاح المؤمن.',link:'سُميت السورة "غافر" و"المؤمن" تكريماً لهذا الرجل المجهول الاسم.'},
+
+  {id:'jannatayn',cat:'others',name:'صاحب الجنتين',surahs:['الكهف (32-44)'],
+   ayah:'﴿وَكَانَ لَهُ ثَمَرٌ فَقَالَ لِصَاحِبِهِ وَهُوَ يُحَاوِرُهُ أَنَا أَكْثَرُ مِنكَ مَالًا وَأَعَزُّ نَفَرًا﴾',ref:'الكهف: 34',
+   teaser:'جنتان بلا شكر — والعاقبة: "أصبح يُقلّب كفّيه"',
+   summary:'رجل أُعطي جنتين فخمتين فتكبّر وأعجب. نصحه صاحبه المؤمن فرفض. أحاط الله بجنتيه فأصبحتا خاوية. "يقلّب كفيه" ندماً — بعد فوات الأوان.',
+   stages:[
+     {title:'الجنتان والنعمة الكاملة',hint:'ما طبيعة هذه النعمة ولماذا كانت اختباراً؟',chars:['صاحب الجنتين'],ayah:'﴿وَاضْرِبْ لَهُم مَّثَلًا رَّجُلَيْنِ جَعَلْنَا لِأَحَدِهِمَا جَنَّتَيْنِ مِنْ أَعْنَابٍ﴾',ayah_ref:'الكهف: 32',detail:'جنتان من أعناب محاطتان بنخيل ونهر يجري بينهما وثمار وفيرة. نعمة كاملة من كل وجه. النعمة الكاملة اختبار أصعب من الفقر — كيف تتصرف حين تملك كل شيء؟',note:'الاختبار بالنعمة أصعب من الاختبار بالمصيبة. أكثر الناس يصبرون على المصيبة — لكن قليلون يشكرون في النعمة.'},
+     {title:'الغرور وقول "ما أظن أن تبيد"',hint:'ما الخطأ الكبير الذي وقع فيه؟',chars:['صاحب الجنتين'],ayah:'﴿وَدَخَلَ جَنَّتَهُ وَهُوَ ظَالِمٌ لِّنَفْسِهِ قَالَ مَا أَظُنُّ أَن تَبِيدَ هَٰذِهِ أَبَدًا﴾',ayah_ref:'الكهف: 35',detail:'دخل جنته قائلاً: "ما أظن أن تبيد هذه أبداً". نسي مُعطي النعمة. نسي أنها مؤقتة. ثم تجرّأ: "وما أظن الساعة قائمة". القرآن وصف دخوله: "وهو ظالم لنفسه".',note:'"وهو ظالم لنفسه" — الغرور ظلم للنفس. من نسي الله في النعمة ظلم نفسه قبل أن يظلم غيره.'},
+     {title:'نصيحة الصاحب المؤمن ورفضها',hint:'ما النصيحة وما الجملة الأساسية التي لم يقلها؟',chars:['الصاحب المؤمن','صاحب الجنتين'],ayah:'﴿وَلَوْلَا إِذْ دَخَلْتَ جَنَّتَكَ قُلْتَ مَا شَاءَ اللَّهُ لَا قُوَّةَ إِلَّا بِاللَّهِ﴾',ayah_ref:'الكهف: 39',detail:'قال الصاحب المؤمن: "لولا أنك حين دخلت جنتك قلت ما شاء الله لا قوة إلا بالله". جملة واحدة كانت كافية للوقاية. لكنه رفض النصيحة واستمر في تكبّره.',note:'"ما شاء الله لا قوة إلا بالله" — أقوى وقاية من الغرور. من قالها حين دخل بيته أو جنته كان محمياً.'},
+     {title:'الهلاك والندم الذي جاء بعد فوات الأوان',hint:'كيف كان هلاك الجنتين وكيف كان ندمه؟',chars:['صاحب الجنتين'],ayah:'﴿وَأُحِيطَ بِثَمَرِهِ فَأَصْبَحَ يُقَلِّبُ كَفَّيْهِ عَلَىٰ مَا أَنفَقَ فِيهَا﴾',ayah_ref:'الكهف: 42',detail:'أحاط الله بثمره فجاء الهلاك من كل جهة. أصبحت الجنتان خاوية. قال: "يا ليتني لم أُشرك بربي أحداً". الندم جاء بعد الخسارة الكاملة.',note:'"يا ليتني" — ليتني لم تأتِ إلا بعد الخسارة الكاملة. الندم بعد فوات الأوان درس — لكن الاعتبار قبله فضيلة.'},
+   ],
+   surah_details:[{n:'الكهف (32-44)',d:'القصة الثانية في الكهف — درس المال والشكر'}],
+   lesson:'"ما شاء الله لا قوة إلا بالله" — أقوى وقاية من الغرور. النعمة بلا شكر فتنة.',link:'القصة الثانية في الكهف بعد أصحاب الكهف — تُكمل درس الدنيا والآخرة.'},
+
+  {id:'asiya',cat:'others',name:'آسيا امرأة فرعون',surahs:['القصص','التحريم'],
+   ayah:'﴿وَضَرَبَ اللَّهُ مَثَلًا لِّلَّذِينَ آمَنُوا امْرَأَتَ فِرْعَوْنَ﴾',ref:'التحريم: 11',
+   teaser:'مثل للمؤمنين جميعاً — زوجة فرعون اختارت الله على القصر',
+   summary:'آسيا امرأة فرعون جُعلت مثلاً للمؤمنين رجالاً ونساءً. التقطت موسى الرضيع من النهر. آمنت بعد رؤية معجزات موسى. عُذّبت. دعت ربها. الله جعلها مثلاً.',
+   stages:[
+     {title:'إنقاذ موسى من النهر',hint:'كيف أنقذت آسيا موسى وما أهمية هذا الفعل؟',chars:['آسيا','موسى الرضيع','فرعون'],ayah:'﴿وَقَالَتِ امْرَأَتُ فِرْعَوْنَ قُرَّتُ عَيْنٍ لِّي وَلَكَ لَا تَقْتُلُوهُ عَسَىٰ أَن يَنفَعَنَا أَوْ نَتَّخِذَهُ وَلَدًا﴾',ayah_ref:'القصص: 9',detail:'حين التقط آل فرعون الطفل أراد فرعون قتله. قالت آسيا: "قرة عين لي ولك — لا تقتلوه عسى أن ينفعنا أو نتخذه ولداً". فعلها هذا أنقذ موسى الذي سيُهلك فرعون لاحقاً. الله استخدمها أداةً لتحقيق مشيئته.',note:'آسيا أنقذت عدو زوجها الذي سيُسقطه لاحقاً. الله يدبّر الأمور من حيث لا يُتوقع.'},
+     {title:'الإيمان المكتوم ثم المُعلَن',hint:'كيف آمنت آسيا وما الثمن؟',chars:['آسيا','فرعون'],ayah:'﴿وَضَرَبَ اللَّهُ مَثَلًا لِّلَّذِينَ آمَنُوا امْرَأَتَ فِرْعَوْنَ إِذْ قَالَتْ رَبِّ ابْنِ لِي عِندَكَ بَيْتًا فِي الْجَنَّةِ﴾',ayah_ref:'التحريم: 11',detail:'آمنت آسيا بعد رؤية معجزات موسى. عُثر فرعون على إيمانها فعذّبها. كانت تُعذَّب وقلبها في الجنة: "ربّ ابنِ لي عندك بيتاً في الجنة ونجّني من فرعون وعمله ونجّني من القوم الظالمين".',note:'جسدها يُعذَّب وقلبها في الجنة — هذه الحرية الداخلية لا يملكها أحد إلا المؤمن المخلص. الجلاد يملك الجسد لا الروح.'},
+     {title:'المثل الكوني للمؤمنين جميعاً',hint:'لماذا جعل الله آسيا مثلاً للمؤمنين وليس مثلاً للنساء فقط؟',chars:['آسيا'],ayah:'﴿وَضَرَبَ اللَّهُ مَثَلًا لِّلَّذِينَ آمَنُوا﴾',ayah_ref:'التحريم: 11',detail:'القرآن قال "للذين آمنوا" — رجالاً ونساءً. آسيا مثل لكل مؤمن في بيئة فاسدة أو طاغية. رسالتها: بيئتك لا تُحدّد إيمانك. أشرّ رجل في التاريخ لم يمنع زوجته من أن تكون في أعلى الجنة.',note:'الإيمان لا علاقة له بالوضع الاجتماعي. البيئة الفاسدة لا تُلزمك بالفساد — بل ربما كانت اختبارك الأكبر.'},
+   ],
+   surah_details:[{n:'القصص (9)',d:'إنقاذها لموسى — الفعل الذي غيّر التاريخ'},{n:'التحريم (11)',d:'جعلها مثلاً للمؤمنين — أعلى تكريم'}],
+   lesson:'الإيمان لا علاقة له بالوضع الاجتماعي. البيئة الفاسدة لا تُلزمك بالفساد. الحرية الداخلية لا يملكها أحد سوى صاحبها.',link:'لحظتان في القرآن رسمتا أعمق صورة عن الحرية الإيمانية الداخلية.'},
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+let activeCat='qabla', openStory=null, openStageIdx=-1;
+
+/* ============================================================
+   BOOT
+============================================================ */
+function startApp(){
+  document.getElementById('splash').classList.add('gone');
+  setTimeout(()=>document.getElementById('splash').remove(),600);
+  buildEras();buildCats();renderList();
+}
+
+/* ============================================================
+   HOME / ERAS
+============================================================ */
+function buildEras(){
+  const el=document.getElementById('era-list');
+  ERAS.forEach(era=>{
+    const block=document.createElement('div');
+    block.className='era-block';
+    const stories=STORIES.filter(s=>era.stories.includes(s.id));
+    const storyCards=stories.map(s=>`
+      <div class="era-story-card" onclick="openDirectStory('${s.id}')">
+        <div class="esc-name" style="color:${era.color}">${s.name}</div>
+        <div class="esc-surahs">${s.surahs.slice(0,2).join(' · ')}${s.surahs.length>2?'...':''}</div>
+        <div class="esc-stages" style="color:${era.color}">${s.stages.length} مراحل</div>
+      </div>`).join('');
+    block.innerHTML=`
+      <div class="era-head" onclick="toggleEra(this)">
+        <div class="era-color-strip" style="background:${era.color}"></div>
+        <div class="era-head-text">
+          <div class="era-name">${era.name}</div>
+          <div class="era-period">${era.period} · ${stories.length} ${stories.length===1?'قصة':'قصص'}</div>
+        </div>
+        <div class="era-count" style="color:${era.color}">${stories.length}</div>
+        <div class="era-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+      </div>
+      <div class="era-stories">${storyCards}</div>`;
+    el.appendChild(block);
+  });
+}
+
+function toggleEra(head){
+  const stories=head.nextElementSibling;
+  const arrow=head.querySelector('.era-arrow');
+  const isOpen=stories.classList.contains('open');
+  stories.classList.toggle('open',!isOpen);
+  arrow.classList.toggle('open',!isOpen);
+}
+
+function openDirectStory(id){
+  openStory=STORIES.find(s=>s.id===id);
+  renderStory();
+  document.getElementById('v-story').classList.add('open');
+  document.querySelector('#v-story .pscroll').scrollTop=0;
+}
+
+function openListPanel(){
+  document.getElementById('v-list').classList.add('open');
+}
+
+function goHome(){
+  document.getElementById('v-stage').classList.remove('open');
+  document.getElementById('v-story').classList.remove('open');
+  document.getElementById('v-list').classList.remove('open');
+}
+
+/* ============================================================
+   LIST
+============================================================ */
+function catStories(id){return STORIES.filter(s=>s.cat===id)}
+function catColor(id){return CATS.find(c=>c.id===id)?.color||'#7a6448'}
+function catLabel(id){return CATS.find(c=>c.id===id)?.label||''}
+
+function buildCats(){
+  const el=document.getElementById('cats');
+  CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='cat'+(c.id===activeCat?' on':'');
+    if(c.id===activeCat){b.style.background=c.color;b.style.borderColor=c.color;}
+    b.textContent=c.label;
+    b.onclick=()=>switchCat(c.id,b);
+    el.appendChild(b);
+  });
+}
+function switchCat(id,btn){
+  activeCat=id;
+  document.querySelectorAll('.cat').forEach(b=>{b.className='cat';b.style.cssText=''});
+  btn.className='cat on';btn.style.background=catColor(id);btn.style.borderColor=catColor(id);
+  renderList();
+}
+function renderList(){
+  const st=catStories(activeCat);
+  document.getElementById('catLbl').textContent=catLabel(activeCat);
+  document.getElementById('catCnt').textContent=st.length;
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  st.forEach((s,i)=>{
+    const col=catColor(s.cat);
+    const pills=s.surahs.slice(0,3).map(n=>`<div class="sc-pill">${n}</div>`).join('')+(s.surahs.length>3?`<div class="sc-pill">+${s.surahs.length-3}</div>`:'');
+    const d=document.createElement('div');
+    d.className='sc fade-in';d.style.animationDelay=(i*30)+'ms';
+    d.style.borderTop=`3px solid ${col}`;
+    d.innerHTML=`<div class="sc-badge" style="color:${col}">${s.stages.length} مراحل</div><div class="sc-name">${s.name}</div><div class="sc-pills">${pills}</div><div class="sc-teaser">${s.teaser}</div>`;
+    d.onclick=()=>openStoryPanel(s.id);
+    grid.appendChild(d);
+  });
+}
+
+/* ============================================================
+   STORY PANEL
+============================================================ */
+function openStoryPanel(id){
+  openStory=STORIES.find(s=>s.id===id);
+  renderStory();
+  document.getElementById('v-story').classList.add('open');
+  document.querySelector('#v-story .pscroll').scrollTop=0;
+}
+function closeStory(){document.getElementById('v-story').classList.remove('open')}
+function renderStory(){
+  const s=openStory,col=catColor(s.cat);
+  const catEl=document.getElementById('s-cat');
+  catEl.textContent=catLabel(s.cat);catEl.style.color=col;
+  const pills=s.surahs.map(n=>`<div class="pill">${n}</div>`).join('');
+  const dets=s.surah_details.map(d=>`<div class="surah-row"><div class="surah-name" style="color:${col}">${d.n}</div><div class="surah-desc">${d.d}</div></div>`).join('');
+  const items=s.stages.map((st,i)=>`
+    <div class="stage-item" onclick="openStagePanel(${i})">
+      <div class="si-num" style="border-color:${col};color:${col}">${i+1}</div>
+      <div class="si-content"><div class="si-title">${st.title}</div><div class="si-hint" style="color:${col}">${st.hint}</div></div>
+      <div class="si-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    </div>`).join('');
+  document.getElementById('s-scroll').innerHTML=`
+    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35">${s.name}</div>
+    <div class="pills">${pills}</div>
+    <div class="ayah-box"><div class="ayah-text">${s.ayah}</div><div class="ayah-ref">${s.ref}</div></div>
+    <div class="sec-ttl" style="margin-bottom:5px">ملخص القصة</div>
+    <div class="sec-body" style="margin-bottom:14px">${s.summary}</div>
+    <div class="sec-ttl" style="margin-bottom:2px">مراحل القصة</div>
+    <div style="font-size:10px;color:${col};margin-bottom:9px">▼ اضغط على أي مرحلة لتفاصيلها الكاملة</div>
+    ${items}
+    <div class="sec-ttl" style="margin-top:14px;margin-bottom:6px">السور وزاوية كل سورة</div>
+    ${dets}
+    <div class="lesson-box" style="margin-top:12px"><div class="lesson-lbl">الدرس الأعمق</div><div class="lesson-txt">${s.lesson}</div></div>
+    <div class="link-box"><div class="link-lbl">ارتباط السور ببعض</div><div class="link-txt">${s.link}</div></div>`;
+}
+
+/* ============================================================
+   STAGE PANEL
+============================================================ */
+function openStagePanel(idx){
+  openStageIdx=idx;
+  renderStage();
+  document.getElementById('v-stage').classList.add('open');
+  document.querySelector('#v-stage .pscroll').scrollTop=0;
+}
+function closeStage(){document.getElementById('v-stage').classList.remove('open')}
+function navStage(dir){
+  const nxt=openStageIdx+dir;
+  if(nxt>=0&&nxt<openStory.stages.length){
+    openStageIdx=nxt;renderStage();
+    document.querySelector('#v-stage .pscroll').scrollTop=0;
+  }
+}
+function renderStage(){
+  const s=openStory,st=s.stages[openStageIdx],col=catColor(s.cat);
+  const total=s.stages.length;
+  document.getElementById('st-name').textContent=s.name;
+  document.getElementById('st-name').style.color=col;
+  document.getElementById('st-counter').textContent=`المرحلة ${openStageIdx+1} من ${total}`;
+  document.getElementById('st-prev').disabled=openStageIdx===0;
+  document.getElementById('st-next').disabled=openStageIdx===total-1;
+  const chars=st.chars.map(c=>`<div class="char-tag">${c}</div>`).join('');
+  const pills=s.stages.map((_,i)=>`<div class="ssp${i===openStageIdx?' on':''}" style="${i===openStageIdx?`background:${col};border-color:${col}`:`border-color:${col}60;color:${col}`}" onclick="openStagePanel(${i})">${i+1}</div>`).join('');
+  document.getElementById('st-scroll').innerHTML=`
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:9px;line-height:1.4">${st.title}</div>
+    <div class="stage-step-pills">${pills}</div>
+    ${chars?`<div class="sec-ttl" style="margin-bottom:4px">الشخصيات</div><div class="chars-row" style="margin-bottom:11px">${chars}</div>`:''}
+    ${st.ayah?`<div class="ayah-box"><div class="ayah-text">${st.ayah}</div><div class="ayah-ref">${st.ayah_ref||''}</div></div>`:''}
+    <div class="sec-ttl" style="margin-bottom:5px">ما الذي حدث في هذه المرحلة؟</div>
+    <div class="stage-detail-body" style="margin-bottom:13px">${st.detail}</div>
+    <div class="note-box" style="border-right-color:${col}"><div class="note-lbl" style="color:${col}">الدرس من هذه المرحلة</div><div class="note-txt">${st.note}</div></div>
+    ${openStageIdx===total-1?`<div style="text-align:center;padding:10px;border-radius:10px;background:${col}18;border:1px solid ${col}40;font-size:11px;color:${col};margin-top:4px">اكتملت مراحل القصة — الدرس الكامل في صفحة القصة ←</div>`:''}`;
+}
+
+/* ============================================================
+   SHARE
+============================================================ */
+function openModal(){document.getElementById('modalBg').classList.add('show')}
+function closeModal(e){if(!e||e.target===document.getElementById('modalBg'))document.getElementById('modalBg').classList.remove('show')}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+function doShare(type){
+  if(type==='link'){navigator.clipboard.writeText(window.location.href).then(()=>showToast('تم نسخ الرابط!')).catch(()=>showToast('افتح في متصفح'))}
+  else if(type==='dl'){const b=new Blob([document.documentElement.outerHTML],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='قصص-القرآن-كاملة.html';a.click();showToast('جاري التحميل...')}
+  else if(type==='card'&&openStory){const s=openStory;navigator.clipboard.writeText(`${s.name}\n\n${s.ayah}\n${s.ref}\n\nملخص: ${s.summary}\n\nالدرس: ${s.lesson}\n\nالسور: ${s.surahs.join(' — ')}\n\n— قصص القرآن الكريم`).then(()=>showToast('تم نسخ القصة!'))}
+  closeModal();
+}
+
+/* swipe / keyboard */
+function addSwipe(id,fn){
+  const el=document.getElementById(id);
+  el.addEventListener('touchstart',e=>{
+    if(e.touches[0].clientX>45)return;
+    const sx=e.touches[0].clientX;
+    el.addEventListener('touchend',function h(e2){el.removeEventListener('touchend',h);if(e2.changedTouches[0].clientX-sx>55)fn();},{once:true});
+  },{passive:true});
+}
+addSwipe('v-list',()=>document.getElementById('v-list').classList.remove('open'));
+addSwipe('v-story',closeStory);
+addSwipe('v-stage',closeStage);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('v-stage').classList.contains('open'))closeStage();
+    else if(document.getElementById('v-story').classList.contains('open'))closeStory();
+    else if(document.getElementById('v-list').classList.contains('open'))document.getElementById('v-list').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
